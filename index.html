@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Melli OS 1402 | Node of Freedom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入优秀的波斯语开源字体 Vazirmatn -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v3.3.0/Vazirmatn-font-face.css" rel="stylesheet"
+        type="text/css" />
+    <style>
+        :root {
+            --sys-accent: #117961;
+            /* 默认：伊斯兰绿 */
+            --sys-red: #cc3333;
+            --sys-yellow: #ffbd2e;
+            --sys-green: #27c93f;
+            --win-bg: #f5f5f5;
+            --win-border: #b0b0b0;
+            --titlebar-active: linear-gradient(to bottom, #f6f6f6, #d4d4d4);
+            --titlebar-inactive: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            --text-main: #111111;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-touch-callout: none;
+            font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: #0a0f0d;
+            overscroll-behavior-y: none;
+        }
+
+        .rtl-text {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .ltr-text {
+            direction: ltr;
+            text-align: left;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+
+        #mac-power-off {
+            position: fixed;
+            inset: 0;
+            background-color: #050508;
+            z-index: 15000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .power-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #1a1a1a, #0a0a0a);
+            transition: all 0.2s;
+        }
+
+        .power-btn:hover {
+            border-color: #555;
+            box-shadow: 0 0 15px rgba(204, 51, 51, 0.3);
+        }
+
+        .power-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 壁纸 - 质感更好的景深渐变 */
+        #mac-desktop {
+            position: fixed;
+            inset: 0;
+            display: none;
+            z-index: 100;
+            transition: background 2s ease-in-out;
+            background: radial-gradient(circle at 50% 100%, #1a2a22 0%, #0d1712 40%, #050806 100%);
+        }
+
+        /* 解放后的壁纸：伊朗三色旗（绿白红）色调的曙光 */
+        #mac-desktop.hacked {
+            background: radial-gradient(circle at 50% 120%, #e63946 0%, #f1faee 30%, #1d3557 70%, #0b1524 100%);
+        }
+
+        .mesh-gradient {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .mesh-blob {
+            position: absolute;
+            border-radius: 50%;
+            transition: background 2s, opacity 2s, filter 2s;
+            opacity: 0.2;
+            filter: blur(60px);
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, #117961 0%, transparent 70%);
+        }
+
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 40vw;
+            background: radial-gradient(ellipse, #cc3333 0%, transparent 70%);
+        }
+
+        #mac-desktop.hacked .blob-1 {
+            background: radial-gradient(circle, #2a9d8f 0%, transparent 70%);
+            opacity: 0.3;
+            filter: blur(80px);
+        }
+
+        #mac-desktop.hacked .blob-2 {
+            background: radial-gradient(circle, #e9c46a 0%, transparent 70%);
+            opacity: 0.4;
+            filter: blur(80px);
+        }
+
+        /* 启动屏幕 */
+        #mac-boot {
+            position: fixed;
+            inset: 0;
+            background-color: #080a09;
+            z-index: 500;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .ir-logo {
+            width: 90px;
+            height: 90px;
+            filter: drop-shadow(0 0 10px rgba(204, 51, 51, 0.4));
+            margin-bottom: 40px;
+            transition: all 1s;
+        }
+
+        .progress-bar-container {
+            width: 220px;
+            height: 5px;
+            background-color: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #117961;
+            transition: width 0.2s ease-out, background 1s;
+            box-shadow: 0 0 5px rgba(17, 121, 97, 0.5);
+        }
+
+        /* 登录屏幕 */
+        #mac-login {
+            position: fixed;
+            inset: 0;
+            z-index: 400;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(10, 15, 13, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .login-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #222, #000);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+            border: 2px solid rgba(17, 121, 97, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+
+        .login-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            color: #fff;
+            outline: none;
+            width: 220px;
+            text-align: center;
+            font-size: 15px;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        .login-input:focus {
+            border-color: var(--sys-accent);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(17, 121, 97, 0.3);
+        }
+
+        .login-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        #screen-flash {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        /* 顶部菜单栏 */
+        #menu-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 1000;
+            font-size: 13px;
+            color: #111;
+            font-weight: 500;
+            transition: all 0.5s;
+        }
+
+        .menu-item {
+            padding: 0 12px;
+            cursor: default;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+            margin: 0 2px;
+            transition: background 0.1s;
+        }
+
+        .menu-item:active,
+        .menu-item.active {
+            background-color: var(--sys-accent);
+            color: white;
+        }
+
+        .menu-item svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-right: 12px;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        /* 下拉菜单 */
+        #apple-dropdown {
+            position: absolute;
+            top: 28px;
+            left: 8px;
+            width: 240px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 0 0 6px 6px;
+            padding: 4px 0;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .dd-item {
+            padding: 6px 16px;
+            color: #111;
+            font-size: 13px;
+            cursor: default;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .dd-item:hover {
+            background-color: var(--sys-accent);
+            color: white;
+        }
+
+        .dd-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 4px 0;
+        }
+
+        /* 控制中心 */
+        #control-center {
+            position: fixed;
+            top: 36px;
+            right: 8px;
+            width: 320px;
+            background: rgba(245, 245, 245, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            padding: 12px;
+            z-index: 1001;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateY(-10px);
+        }
+
+        #control-center.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .cc-module {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cc-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--sys-accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: background 0.5s;
+        }
+
+        .cc-icon-btn.off {
+            background: #e0e0e0;
+            color: #888;
+        }
+
+        /* 右键菜单 */
+        #context-menu {
+            position: absolute;
+            width: 220px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 4px 0;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Dock栏 */
+        #dock-container {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 6px 10px;
+            gap: 8px;
+            height: 74px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            transition: all 0.5s;
+        }
+
+        .dock-separator {
+            width: 1px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 0 4px;
+            align-self: center;
+            transition: all 0.5s;
+        }
+
+        .dock-icon-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+        }
+
+        .dock-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            cursor: pointer;
+            transform-origin: bottom center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .dock-icon:active {
+            filter: brightness(0.8);
+        }
+
+        .dock-indicator {
+            width: 4px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            opacity: 0;
+            margin-top: 4px;
+            transition: background-color 0.5s;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .dock-icon-wrapper.opened .dock-indicator {
+            opacity: 1;
+        }
+
+        .dock-tooltip {
+            position: absolute;
+            top: -45px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 6px;
+            pointer-events: none;
+            opacity: 0;
+            white-space: nowrap;
+            backdrop-filter: blur(5px);
+            transition: opacity 0.15s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dock-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.75) transparent transparent transparent;
+        }
+
+        .dock-icon-wrapper:hover .dock-tooltip {
+            opacity: 1;
+        }
+
+        /* 窗口 */
+        .mac-window {
+            position: absolute;
+            background-color: var(--win-bg);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            min-width: 320px;
+            min-height: 200px;
+            display: none;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+
+        .mac-window.inactive {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 100 !important;
+        }
+
+        .mac-window.inactive .t-btn {
+            background-color: #d4d4d4 !important;
+            border-color: #c0c0c0 !important;
+        }
+
+        .mac-window.inactive .t-btn::after {
+            display: none;
+        }
+
+        .mac-window.inactive .mac-titlebar {
+            background: var(--titlebar-inactive) !important;
+            color: #888;
+        }
+
+        .mac-titlebar {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            cursor: default;
+            touch-action: none;
+            position: relative;
+            background: var(--titlebar-active);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+            transition: background 0.5s;
+        }
+
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            position: absolute;
+            left: 12px;
+        }
+
+        .t-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.1s;
+        }
+
+        .t-btn::after {
+            content: '';
+            opacity: 0;
+            color: rgba(0, 0, 0, 0.6);
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .traffic-lights:hover .t-btn::after {
+            opacity: 1;
+        }
+
+        .t-close {
+            background: var(--sys-red);
+            border: 1px solid #b02a2a;
+        }
+
+        .t-close::after {
+            content: '✕';
+            font-size: 7px;
+        }
+
+        .t-min {
+            background: var(--sys-yellow);
+            border: 1px solid #dca020;
+        }
+
+        .t-min::after {
+            content: '−';
+            font-size: 9px;
+            line-height: 10px;
+        }
+
+        .t-max {
+            background: var(--sys-green);
+            border: 1px solid #1fa332;
+        }
+
+        .t-max::after {
+            content: '+';
+            font-size: 9px;
+            line-height: 10px;
+        }
+
+        .mac-content {
+            flex-grow: 1;
+            overflow: auto;
+            position: relative;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            background: #ececec;
+            transition: all 0.5s;
+        }
+
+        .textedit-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: text;
+            transition: color 0.5s;
+        }
+
+        .textedit-toolbar {
+            height: 40px;
+            background: #f6f6f6;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.5s;
+        }
+
+        .te-tool {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #555;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: background 0.1s, color 0.5s;
+        }
+
+        .te-tool:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .te-tool:active {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .notepad-text {
+            font-size: 15px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            padding: 30px 40px;
+            flex-grow: 1;
+            background: #ffffff;
+            color: #1a1a1a;
+            margin: 0;
+            outline: none;
+            user-select: text;
+            transition: all 0.5s;
+        }
+
+        /* 监视器 */
+        .am-layout {
+            display: flex;
+            height: 100%;
+            background: #fff;
+            transition: background 0.5s;
+        }
+
+        .am-sidebar {
+            width: 160px;
+            background: #f0f0f0;
+            border-right: 1px solid #ddd;
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s;
+        }
+
+        .am-nav-item {
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: default;
+            transition: color 0.5s;
+        }
+
+        .am-nav-item.active {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--sys-accent);
+            font-weight: 600;
+            transition: background 0.5s, color 0.5s;
+        }
+
+        .am-main {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            transition: background 0.5s;
+        }
+
+        .am-card {
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+            transition: all 0.5s;
+        }
+
+        /* 终端 */
+        .terminal-bg {
+            background-color: rgba(10, 15, 12, 0.95);
+            padding: 16px;
+            font-family: "SF Mono", "Consolas", "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            flex-grow: 1;
+            color: #27c93f;
+            user-select: text;
+            overflow-y: auto;
+        }
+
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #27c93f;
+            outline: none;
+            width: 70%;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .terminal-output {
+            user-select: text;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.4);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        /* 黑暗模式 (解放后) UI 覆盖 */
+        body.hacked-theme {
+            --win-bg: #1e2420;
+            --text-main: #f0f0f0;
+            --titlebar-active: linear-gradient(to bottom, #3a443e, #2a342e);
+            --titlebar-inactive: linear-gradient(to bottom, #2a342e, #1e2420);
+            --sys-accent: #e63946;
+            /* 解放后口音色变为伊朗红/阳光 */
+        }
+
+        body.hacked-theme .mac-content {
+            background: #1e2420;
+        }
+
+        body.hacked-theme .textedit-toolbar {
+            background: #2a342e;
+            border-color: #4a544e;
+        }
+
+        body.hacked-theme .te-tool {
+            color: #ccc;
+        }
+
+        body.hacked-theme .te-tool:hover {
+            background: #3a443e;
+        }
+
+        body.hacked-theme .notepad-text {
+            background: #151a17;
+            color: #e0e0e0;
+        }
+
+        body.hacked-theme .am-layout {
+            background: #1e2420;
+        }
+
+        body.hacked-theme .am-sidebar {
+            background: #151a17;
+            border-color: #3a443e;
+        }
+
+        body.hacked-theme .am-main {
+            background: #1e2420;
+        }
+
+        body.hacked-theme .am-card {
+            background: #151a17;
+            border-color: #3a443e;
+        }
+
+        body.hacked-theme .am-nav-item {
+            color: #aaa;
+        }
+
+        body.hacked-theme .am-nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e9c46a;
+        }
+
+        body.hacked-theme .textedit-title {
+            color: #e0e0e0;
+        }
+
+        /* 修复Tailwind在黑夜模式的对比度 */
+        body.hacked-theme .text-gray-800 {
+            color: #f0f0f0 !important;
+        }
+
+        body.hacked-theme .text-gray-700 {
+            color: #d0d0d0 !important;
+        }
+
+        body.hacked-theme .text-gray-500 {
+            color: #a0a0a0 !important;
+        }
+
+        body.hacked-theme .bg-gray-50 {
+            background-color: #111 !important;
+        }
+
+        body.hacked-theme .bg-white {
+            background-color: #1e2420 !important;
+        }
+
+        body.hacked-theme .border-gray-200 {
+            border-color: #3a443e !important;
+        }
+
+        body.hacked-theme .bg-gray-200 {
+            background-color: #3a443e !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div id="screen-flash"></div>
+
+    <!-- 关机状态 -->
+    <div id="mac-power-off">
+        <div class="power-btn" onclick="startBootSequence()">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#cc3333" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+        </div>
+        <div class="text-gray-500 mt-6 text-sm font-mono tracking-widest opacity-60">POWER OFF</div>
+    </div>
+
+    <!-- 启动系统 -->
+    <div id="mac-boot">
+        <!-- 初始：伊斯兰共和国风格徽章 (使用几何抽象替代) -->
+        <svg class="ir-logo" id="boot-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#cc3333"
+                d="M45,10 C45,10 40,30 30,40 C20,50 10,40 10,40 C10,40 25,65 50,85 C75,65 90,40 90,40 C90,40 80,50 70,40 C60,30 55,10 55,10 C55,10 55,35 50,50 C45,35 45,10 45,10 Z M50,15 L50,8 M35,25 L32,20 M65,25 L68,20" />
+            <circle cx="50" cy="50" r="4" fill="#cc3333" />
+        </svg>
+        <div class="text-gray-400 text-sm mt-2 mb-8 tracking-[0.4em] font-semibold" id="boot-text">MELLI OS</div>
+        <div class="progress-bar-container">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
+    <!-- 登录屏幕 -->
+    <div id="mac-login">
+        <div class="login-avatar">
+            <svg class="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M8 7h8"></path> <!-- 象征头巾/包头 -->
+            </svg>
+        </div>
+        <div class="text-white text-2xl font-semibold mb-1 tracking-wide" id="login-user">برادر / Brother</div>
+        <div class="text-gray-300 text-sm mb-6 font-medium" id="login-desc">سیستم‌عامل ملی ۱۴۰۲</div>
+        <input type="password" class="login-input ltr-text" id="login-pw" placeholder="رمز عبور / Password"
+            autocomplete="off">
+        <div class="text-white/40 text-xs mt-6 font-medium tracking-wide" id="login-hint">برای ورود Enter را فشار دهید
+        </div>
+    </div>
+
+    <!-- 桌面系统 -->
+    <div id="mac-desktop">
+        <div class="mesh-gradient">
+            <div class="mesh-blob blob-1"></div>
+            <div class="mesh-blob blob-2"></div>
+        </div>
+
+        <!-- 顶部菜单栏 -->
+        <div id="menu-bar">
+            <div class="menu-item actionable" style="padding: 0 16px; position:relative;" id="btn-apple-menu">
+                <!-- 初始Logo -->
+                <svg id="topbar-logo" viewBox="0 0 100 100" width="16" height="16">
+                    <path fill="#cc3333"
+                        d="M45,10 C45,10 40,30 30,40 C20,50 10,40 10,40 C10,40 25,65 50,85 C75,65 90,40 90,40 C90,40 80,50 70,40 C60,30 55,10 55,10 C55,10 55,35 50,50 C45,35 45,10 45,10 Z" />
+                </svg>
+            </div>
+
+            <div class="menu-item font-bold" id="app-name">فایل‌ها</div>
+            <div class="menu-item hidden md:flex" id="menu-file">پرونده</div>
+            <div class="menu-item hidden md:flex" id="menu-edit">ویرایش</div>
+            <div class="menu-item hidden md:flex" id="menu-view">نما</div>
+            <div class="menu-item hidden md:flex" id="menu-window">پنجره</div>
+            <div class="menu-item hidden md:flex" id="menu-help">راهنما</div>
+            <div style="flex-grow: 1;"></div>
+            <div class="status-icons" id="btn-control-center">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z" />
+                </svg>
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z" />
+                </svg>
+            </div>
+            <div class="menu-item ltr-text" id="clock" style="padding-right: 12px; font-variant-numeric: tabular-nums;">
+            </div>
+        </div>
+
+        <!-- 下拉菜单 -->
+        <div id="apple-dropdown">
+            <div class="dd-item" onclick="openWindow('w-about')"><span id="am-about">درباره سیستم‌عامل ملی</span></div>
+            <div class="dd-divider"></div>
+            <div class="dd-item" onclick="sysSleep()"><span id="am-sleep">خواب</span></div>
+            <div class="dd-item" onclick="sysRestart()"><span id="am-restart">راه اندازی مجدد...</span></div>
+            <div class="dd-item" onclick="sysShutdown()"><span id="am-shutdown">خاموش کردن...</span></div>
+        </div>
+
+        <!-- 控制中心面板 -->
+        <div id="control-center">
+            <div class="grid grid-cols-2 gap-3 ltr-text" style="text-align: left;">
+                <div class="cc-module">
+                    <div class="cc-icon-btn" id="cc-wifi-icon"><svg viewBox="0 0 24 24" width="18" height="18"
+                            fill="currentColor">
+                            <path
+                                d="M12.01 21.49L23.64 7c-.45-.34-4.93-4-11.64-4C5.28 3 .81 6.66.36 7l11.63 14.49.01.01.01-.01z" />
+                        </svg></div>
+                    <div class="flex flex-col"><span class="text-gray-800 text-[14px] font-bold" id="lbl-net-title">شبکه
+                            ملی</span><span class="text-[12px] text-blue-600" id="cc-wifi">SHOMA</span></div>
+                </div>
+                <div class="cc-module">
+                    <div class="cc-icon-btn off"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path
+                                d="M17.71 7.71L12 2h-1v7.59L6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 11 13.41V22h1l5.71-5.71-4.3-4.29 4.3-4.29zM13 5.83l1.88 1.88L13 9.59V5.83zm1.88 10.46L13 18.17v-3.76l1.88 1.88z" />
+                        </svg></div>
+                    <div class="flex flex-col"><span class="text-gray-800 text-[14px] font-bold">Bluetooth</span><span
+                            class="text-[12px] text-gray-500" id="lbl-bt-status">مسدود شد</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右键菜单 -->
+        <div id="context-menu">
+            <div class="dd-item" onclick="openWindow('w-terminal')"><span id="cm-new">ترمینال جدید</span></div>
+            <div class="dd-divider"></div>
+            <div class="dd-item"><span id="cm-get">دریافت اطلاعات</span></div>
+            <div class="dd-item" onclick="toggleLanguage()"><span id="cm-lang">تغییر زبان (EN/ZH)</span></div>
+        </div>
+
+        <!-- Dock -->
+        <div id="dock-container">
+            <div class="dock-icon-wrapper" data-window="lang-toggle">
+                <div class="dock-icon bg-gradient-to-b from-gray-700 to-gray-900 border border-gray-500/50">
+                    <svg viewBox="0 0 24 24" fill="white" class="w-8 h-8 drop-shadow-md">
+                        <path
+                            d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z" />
+                    </svg>
+                </div>
+                <div class="dock-indicator"></div>
+                <div class="dock-tooltip" id="dock-lang">فارسی / EN / ZH</div>
+            </div>
+
+            <div class="dock-separator"></div>
+
+            <div class="dock-icon-wrapper" data-window="w-notepad">
+                <div class="dock-icon bg-white border border-gray-300">
+                    <div class="w-full h-full flex flex-col justify-center items-center px-[10px] py-[8px] gap-[4px]">
+                        <div class="w-full h-[3px] bg-red-700 rounded-full"></div>
+                        <div class="w-full h-[3px] bg-gray-400 rounded-full"></div>
+                        <div class="w-full h-[3px] bg-gray-400 rounded-full"></div>
+                        <div class="w-2/3 h-[3px] bg-gray-400 rounded-full self-start"></div>
+                    </div>
+                </div>
+                <div class="dock-indicator"></div>
+                <div class="dock-tooltip" id="dock-doc">IRGC Directives</div>
+            </div>
+
+            <div class="dock-icon-wrapper" data-window="w-monitor">
+                <div class="dock-icon bg-gradient-to-br from-gray-800 to-black border border-gray-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#27c93f" stroke-width="2" class="w-8 h-8">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <div class="dock-indicator"></div>
+                <div class="dock-tooltip" id="dock-mon">FATA Monitor</div>
+            </div>
+
+            <div class="dock-icon-wrapper" data-window="w-terminal">
+                <div class="dock-icon bg-gray-900 border border-gray-600 shadow-inner">
+                    <span class="text-gray-200 font-mono text-xl leading-none font-bold">>_</span>
+                </div>
+                <div class="dock-indicator"></div>
+                <div class="dock-tooltip" id="dock-term">Terminal</div>
+            </div>
+
+            <div class="dock-separator"></div>
+
+            <div class="dock-icon-wrapper" data-window="w-rights">
+                <div class="dock-icon bg-gradient-to-br from-yellow-500 to-yellow-600 border border-yellow-400">
+                    <svg viewBox="0 0 24 24" fill="white" class="w-8 h-8 drop-shadow-md">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    </svg>
+                </div>
+                <div class="dock-indicator"></div>
+                <div class="dock-tooltip" id="dock-rights">Human Rights</div>
+            </div>
+        </div>
+
+        <!-- 关于 -->
+        <div id="w-about" class="mac-window active" style="top: 20vh; left: 30vw; width: 360px; height: 340px;">
+            <div class="mac-titlebar" onpointerdown="startDrag(event, 'w-about')">
+                <div class="traffic-lights">
+                    <div class="t-btn t-close" onclick="closeWindow('w-about')"></div>
+                    <div class="t-btn t-min" onclick="closeWindow('w-about')"></div>
+                </div>
+            </div>
+            <div class="mac-content flex flex-col items-center pt-8 bg-white">
+                <svg id="about-logo" viewBox="0 0 100 100" width="70" height="70" class="mb-4 drop-shadow-md">
+                    <path fill="#cc3333"
+                        d="M45,10 C45,10 40,30 30,40 C20,50 10,40 10,40 C10,40 25,65 50,85 C75,65 90,40 90,40 C90,40 80,50 70,40 C60,30 55,10 55,10 C55,10 55,35 50,50 C45,35 45,10 45,10 Z" />
+                </svg>
+                <div class="text-2xl font-semibold text-gray-800" id="about-title">Melli OS <span
+                        class="font-normal text-gray-500">1402</span></div>
+                <div class="text-[14px] text-gray-500 mt-1 mb-6 transition-colors">Version 12.4 (Build IRI-2024)</div>
+                <div class="w-[85%] h-[1px] bg-gray-200 mb-6 transition-colors"></div>
+                <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-[13px] w-[80%] ltr-text">
+                    <div class="text-right text-gray-500 font-semibold transition-colors" id="lbl-chip">Processor</div>
+                    <div class="text-left text-gray-800 transition-colors">IR-Silicon Qods-2</div>
+                    <div class="text-right text-gray-500 font-semibold transition-colors" id="lbl-mem">Memory</div>
+                    <div class="text-left text-gray-800 transition-colors">8 GB RAM</div>
+                    <div class="text-right text-gray-500 font-semibold transition-colors">Network</div>
+                    <div class="text-left text-gray-800 transition-colors" id="about-net">SHOMA Intranet</div>
+                    <div class="text-right text-gray-500 font-semibold transition-colors">Firewall</div>
+                    <div class="text-left text-red-600 font-semibold transition-colors" id="about-fw">Global Internet
+                        Blocked</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文本编辑: IRGC Directive -->
+        <div id="w-notepad" class="mac-window active"
+            style="top: 8vh; left: 8vw; width: clamp(340px, 60vw, 750px); height: clamp(400px, 70vh, 650px);">
+            <div class="mac-titlebar" onpointerdown="startDrag(event, 'w-notepad')"
+                ondblclick="maximizeWindow('w-notepad')">
+                <div class="traffic-lights">
+                    <div class="t-btn t-close" onclick="closeWindow('w-notepad')"></div>
+                    <div class="t-btn t-min" onclick="closeWindow('w-notepad')"></div>
+                    <div class="t-btn t-max" onclick="maximizeWindow('w-notepad')"></div>
+                </div>
+                <div class="textedit-title"><span id="title-doc">IRGC_Directive_Cyber.txt</span></div>
+            </div>
+            <div class="mac-content">
+                <div class="textedit-toolbar ltr-text">
+                    <div class="te-tool font-bold">B</div>
+                    <div class="te-tool italic">I</div>
+                    <div class="te-tool underline">U</div>
+                    <div class="h-6 w-[1px] bg-gray-300 mx-3 transition-colors"></div>
+                    <div class="te-tool"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z" />
+                        </svg></div>
+                </div>
+                <div class="notepad-text rtl-text" id="manifesto-content" contenteditable="true"></div>
+            </div>
+        </div>
+
+        <!-- 活动监视器 -->
+        <div id="w-monitor" class="mac-window active"
+            style="top: 15vh; left: 15vw; width: clamp(450px, 75vw, 850px); height: clamp(350px, 60vh, 550px);">
+            <div class="mac-titlebar" onpointerdown="startDrag(event, 'w-monitor')"
+                ondblclick="maximizeWindow('w-monitor')">
+                <div class="traffic-lights">
+                    <div class="t-btn t-close" onclick="closeWindow('w-monitor')"></div>
+                    <div class="t-btn t-min" onclick="closeWindow('w-monitor')"></div>
+                    <div class="t-btn t-max" onclick="maximizeWindow('w-monitor')"></div>
+                </div>
+                <div class="textedit-title" id="title-mon">FATA Surveillance Monitor</div>
+            </div>
+            <div class="mac-content am-layout ltr-text">
+                <div class="am-sidebar hidden sm:flex">
+                    <div class="am-nav-item active"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                            </path>
+                        </svg><span id="nav-cpu">CPU</span></div>
+                    <div class="am-nav-item"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4">
+                            </path>
+                        </svg><span id="nav-mem">Memory</span></div>
+                    <div class="am-nav-item"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg><span id="nav-surv">Surveillance</span></div>
+                </div>
+                <div class="am-main">
+                    <div class="flex justify-between items-center mb-5 px-2">
+                        <span id="lbl-topo" class="font-bold text-gray-800 text-[15px] transition-colors">FATA Cyber
+                            Monitoring Grid</span>
+                        <span class="flex h-4 w-4 relative"><span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span
+                                class="relative inline-flex rounded-full h-4 w-4 bg-red-600"></span></span>
+                    </div>
+                    <div class="flex gap-5 mb-5">
+                        <div class="am-card flex-grow m-0 flex flex-col gap-3 text-[14px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 font-semibold text-[13px] transition-colors"
+                                    id="lbl-status">STATUS</span>
+                                <div class="text-[12px] px-3 py-1 rounded-md border border-red-200 bg-red-50 text-red-700 font-bold tracking-wide transition-all"
+                                    id="monitor-status">FIREWALL: HALAL INTERNET</div>
+                            </div>
+                            <div class="h-[1px] w-full bg-gray-200 transition-colors"></div>
+                            <div class="flex justify-between">
+                                <span id="lbl-flow" class="text-gray-500 font-medium transition-colors">Network</span>
+                                <span id="v-flow" class="font-semibold text-gray-800 transition-all">SHOMA Intranet
+                                    Only</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span id="lbl-censor"
+                                    class="text-gray-500 font-medium transition-colors">Censorship</span>
+                                <span id="v-censor" class="font-bold text-red-600 transition-all">Absolute
+                                    Control</span>
+                            </div>
+                        </div>
+                        <div
+                            class="am-card w-1/2 m-0 p-4 flex flex-col relative overflow-hidden border border-gray-200">
+                            <span class="text-gray-500 font-semibold text-[13px] mb-2 transition-colors"
+                                id="lbl-cpu">CPU Load</span>
+                            <div class="text-gray-800 text-2xl font-mono mb-1 font-semibold transition-colors"
+                                id="cpu-percent">45%</div>
+                            <svg class="absolute bottom-0 left-0 w-full h-1/2 opacity-80" preserveAspectRatio="none"
+                                viewBox="0 0 100 100">
+                                <polyline id="cpu-graph" points="0,100" fill="rgba(39,201,63,0.15)" stroke="#27c93f"
+                                    stroke-width="2" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-grow am-card overflow-hidden relative font-mono text-[13px] text-gray-700 bg-gray-50"
+                        id="surveillance-feed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 终端 -->
+        <div id="w-terminal" class="mac-window active"
+            style="top: 25vh; left: 20vw; width: clamp(400px, 60vw, 750px); height: clamp(300px, 50vh, 550px);">
+            <div class="mac-titlebar" onpointerdown="startDrag(event, 'w-terminal')"
+                ondblclick="maximizeWindow('w-terminal')">
+                <div class="traffic-lights">
+                    <div class="t-btn t-close" onclick="closeWindow('w-terminal')"></div>
+                    <div class="t-btn t-min" onclick="closeWindow('w-terminal')"></div>
+                    <div class="t-btn t-max" onclick="maximizeWindow('w-terminal')"></div>
+                </div>
+                <div class="textedit-title gap-2 font-mono font-medium text-gray-500" style="font-size: 13px;"><svg
+                        class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                    </svg><span id="title-term">freedom — bash — 80x24</span></div>
+            </div>
+            <div class="mac-content ltr-text">
+                <div class="terminal-bg" id="term-container"
+                    onclick="document.getElementById('terminal-input').focus()">
+                    <div id="terminal-output" class="terminal-output"></div>
+                    <div class="flex items-center mt-2">
+                        <span class="text-green-400 font-bold">user@tehran</span><span class="text-green-600 mx-2">~
+                            $</span>
+                        <input type="text" id="terminal-input" class="terminal-input" autocomplete="off"
+                            spellcheck="false" autocapitalize="off">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 真相弹出 (Truth.txt) -->
+        <div id="w-manifesto" class="mac-window active"
+            style="top: 10vh; left: 10vw; width: clamp(360px, 65vw, 750px); height: clamp(450px, 75vh, 650px);">
+            <div class="mac-titlebar" onpointerdown="startDrag(event, 'w-manifesto')"
+                ondblclick="maximizeWindow('w-manifesto')">
+                <div class="traffic-lights">
+                    <div class="t-btn t-close" onclick="closeWindow('w-manifesto')"></div>
+                    <div class="t-btn t-min" onclick="closeWindow('w-manifesto')"></div>
+                    <div class="t-btn t-max" onclick="maximizeWindow('w-manifesto')"></div>
+                </div>
+                <div class="textedit-title"><span id="title-manif">Zan_Zendegi_Azadi.txt</span></div>
+            </div>
+            <div class="mac-content">
+                <div class="textedit-toolbar ltr-text">
+                    <div class="te-tool font-bold">B</div>
+                    <div class="te-tool italic">I</div>
+                    <div class="te-tool underline">U</div>
+                </div>
+                <div class="notepad-text rtl-text" id="truth-content" contenteditable="true"></div>
+            </div>
+        </div>
+
+        <!-- 人权宣言窗口 -->
+        <div id="w-rights" class="mac-window active"
+            style="top: 12vh; left: 12vw; width: clamp(380px, 70vw, 800px); height: clamp(450px, 75vh, 650px);">
+            <div class="mac-titlebar" onpointerdown="startDrag(event, 'w-rights')"
+                ondblclick="maximizeWindow('w-rights')">
+                <div class="traffic-lights">
+                    <div class="t-btn t-close" onclick="closeWindow('w-rights')"></div>
+                    <div class="t-btn t-min" onclick="closeWindow('w-rights')"></div>
+                    <div class="t-btn t-max" onclick="maximizeWindow('w-rights')"></div>
+                </div>
+                <div class="textedit-title"><span id="title-rights">IR_Crimes_Indictment.txt</span></div>
+            </div>
+            <div class="mac-content">
+                <div class="textedit-toolbar ltr-text">
+                    <div class="te-tool font-bold">B</div>
+                    <div class="te-tool italic">I</div>
+                    <div class="te-tool underline">U</div>
+                </div>
+                <div class="notepad-text rtl-text" id="rights-content" contenteditable="true"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentLang = 'fa', isOverriden = false;
+        const langOrder = ['fa', 'en', 'zh'];
+
+        const i18n = {
+            fa: {
+                title_doc: "دستورالعمل_سایبری_سپاه.txt", title_mon: "مانیتورینگ شبکه فتا", title_term: "freedom — bash — 80x24", title_manif: "زن_زندگی_آزادی.txt", title_rights: "کیفرخواست_جنایات.txt",
+                lbl_topo: "شبکه مانیتورینگ فتا (پلیس فضا تولید و تبادل اطلاعات)", mon_fw_active: "فایروال: اینترنت حلال", mon_fw_breached: "فایروال: درهم شکسته شد",
+                lbl_flow: "وضعیت شبکه", mon_flow_val1: "فقط شبکه ملی (SHOMA)", mon_flow_val2: "اینترنت آزاد جهانی",
+                lbl_censor: "وضعیت سانسور", mon_censor_val1: "کنترل مطلق سپاه", mon_censor_val2: "لغو شد", mon_uptime: "زمان فعالیت", lbl_cpu: "بار پردازنده", lbl_chip: "پردازنده", lbl_mem: "حافظه", lbl_disk: "فضای ذخیره‌سازی",
+                menu_file: "پرونده", menu_edit: "ویرایش", menu_view: "نما", menu_window: "پنجره", menu_help: "راهنما",
+                am_about: "درباره سیستم‌عامل ملی", am_sleep: "خواب", am_restart: "راه‌اندازی مجدد...", am_shutdown: "خاموش کردن...",
+                dock_lang: "فارسی → EN", dock_doc: "دستورالعمل‌های سپاه", dock_mon: "مانیتورینگ فتا", dock_term: "ترمینال", dock_rights: "حقوق بشر",
+                cm_new: "ترمینال جدید", cm_get: "دریافت اطلاعات", cm_lang: "تغییر زبان (EN/ZH)",
+                cc_wifi: "شبکه ملی", login_hint: "برای ورود Enter را فشار دهید", login_user: "برادر / Brother", login_desc: "سیستم‌عامل ملی ۱۴۰۲", boot_text: "MELLI OS", app_name: "فایل‌ها",
+                term_boot1: "آخرین ورود: دوشنبه ۲۵ شهریور ساعت ۰۸:۰۰:۰۰", term_boot2: "سیستم‌عامل ملی نسخه ۱۲.۴ (هسته: IR-Linux 5.10)",
+                term_boot3: "⚠ هشدار: تمامی فعالیت‌ها توسط پلیس فتا و اطلاعات سپاه نظارت می‌شود.",
+                term_boot4: "⚠ دسترسی به اینترنت جهانی (واتس‌اپ، اینستاگرام، تلگرام) مسدود است.",
+                term_boot5: "برای مشاهده دستورات 'help' را تایپ کنید.\n",
+                term_help: "دستورات موجود: help, clear, ver, ls, cat, whoami, date, history, override",
+                term_ver: "سیستم‌عامل ملی ۱۴۰۲ (ساخت جمهوری اسلامی، هسته: IR-Linux)",
+                term_bad: "دستور یافت نشد",
+                term_history: "<span class='text-red-400 rtl-text block'>⚠ محرمانه — سابقه جستجو به سازمان اطلاعات گزارش شد</span>  1. sepahnews.ir/گزارش-روز<br>  2. leader.ir/سخنرانی<br>  3. [مسدود] — تلاش برای اتصال به VPN<br>  4. [مسدود] — جستجو: \"مهسا امینی\"<br>  5. [مسدود] — جستجو: \"زن زندگی آزادی\"",
+                term_ovr1: "شروع پروتکل آزادسازی...", term_ovr2: "در حال نفوذ به فایروال شبکه ملی...",
+                term_ovr3: "★ موفقیت: دیوار فرو ریخت. آزادی را نمی‌توان محبوس کرد. ★",
+                term_ovr_done: "سیستم قبلاً آزاد شده است. آزادانه سخن بگو.",
+                log_prefix: "فتا", log_ok: "ثبت شد", log_denied: "مسدود", log_prefix_hacked: "آزادی", log_bypassed: "عبور کرد",
+                about_title: "سیستم‌عامل ملی", about_net: "شبکه ملی (SHOMA)", about_fw: "مسدودسازی اینترنت جهانی",
+                doc_content: `════════════════════════════════════════════\n  فرماندهی سایبری سپاه پاسداران — ابلاغیه شماره ۱\n  IRGC CYBER COMMAND — DIRECTIVE No. 1\n════════════════════════════════════════════\n\nطبقه‌بندی: کاملا سری — ویژه نهادهای امنیتی\n\nبه دستور ولی فقیه:\n\n§۱. محاصره مطلق اطلاعاتی\nدسترسی تمامی شهروندان به اینترنت جهانی (اینستاگرام، واتس‌اپ، یوتیوب، توییتر) اکیداً ممنوع است. شبکه ملی اطلاعات (SHOMA) تنها بستر مجاز است. استفاده از فیلترشکن (VPN) جرم محسوب شده و پیگرد قانونی دارد.\n\n§۲. حجاب اجباری و کنترل سایبری\nرعایت حجاب شرعی در فضای مجازی الزامی است. هرگونه انتشار تصاویر بدون حجاب در فضای مجازی مصداق ترویج فساد و فحشا بوده و توسط گشت ارشاد سایبری شناسایی و با احکام سنگین حبس مواجه خواهد شد.\n\n§۳. سرکوب آزادی بیان\nمفهوم "آزادی" زهر غربی است. هرگونه انتقاد از نظام، رهبری یا سپاه پاسداران مصداق "محاربه" (جنگ با خدا) و "افساد فی الارض" تلقی شده و مجازات آن اعدام است.\n\n§۴. نظارت بر ارتباطات\nتمامی تماس‌ها، پیامک‌ها و ارتباطات دیجیتال توسط قرارگاه ثارالله و پلیس فتا شنود می‌شود. شهروندان موظفند اعضای خانواده، همسایگان و همکاران خود را که تمایلات ضد انقلابی دارند، گزارش دهند.\n\n§۵. ممنوعیت فرهنگ غربی\nترویج سبک زندگی غربی، موسیقی غیرمجاز و رقص اکیداً ممنوع است. خاطیان به بازداشتگاه‌های امنیتی نظیر زندان اوین منتقل خواهند شد.\n\n════════════════════════════════════════════\n  اطاعت کنید. تسلیم شوید.\n════════════════════════════════════════════`,
+                truth_content: `<div style="border-bottom: 2px solid rgba(230,57,70,0.4); padding-bottom: 16px; margin-bottom: 24px;">\n<span style="color:#e63946; font-size:26px; font-weight:800; letter-spacing: 1px;">★ بیانیه سکولار دموکراسی ★</span><br>\n<span style="color:#888; font-size:16px;">DECLARATION OF SECULAR DEMOCRACY</span>\n</div>\n\n<span style="font-size:18px; font-weight:700;">به ملت بزرگ و در بند ایران:</span>\n\nشما تنها نیستید. جهان صدای شما را شنیده است.\n\n<span style="color:#e63946; font-weight:700; font-size:18px; display:inline-block; margin-top:16px;">حقیقتی که از شما پنهان می‌کنند:</span>\n\n• ایران ملک طلق آخوندها نیست — ایران متعلق به تمام ایرانیان است، از هر قوم و عقیده‌ای.\n• دنیای آزاد دشمن شما نیست — این جمهوری اسلامی است که با گروگان گرفتن یک ملت، با جهان می‌جنگد.\n• فقر شما تقدیر الهی نیست — نتیجه فساد سیستماتیک، اختلاس‌ها و صدور تروریسم توسط حاکمان است.\n• دوران حکومت دینی به پایان رسیده است — ما خواهان جدایی کامل دین از سیاست هستیم.\n\n<span style="color:#e63946; font-weight:700; font-size:18px; display:inline-block; margin-top:16px;">حقوق بنیادین شما — که هیچ حکومتی نمی‌تواند سلب کند:</span>\n\n  ✦ حق پوشش اختیاری و آزادی کامل زنان\n  ✦ حق آزادی بیان، عقیده و مطبوعات\n  ✦ حق دسترسی آزاد به اینترنت جهانی\n  ✦ حق انتخاب آزادانه نمایندگان در یک انتخابات دموکراتیک\n\n<span style="font-weight:700; font-size:18px; display:inline-block; margin-top:24px;">معماری استبداد در حال فروپاشی است. نام مهسا (ژینا) امینی رمز ماست.</span>\n\n<span style="color:#e63946; font-size:24px; font-weight:900; margin-top:10px; display:block;">زن، زندگی، آزادی</span><br>\n<span style="color:#2a9d8f; font-size:20px; font-weight:800;">Woman, Life, Freedom</span>\n\n<div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); color: #888; font-size: 13px; font-family: monospace; direction:ltr; text-align:left;">\nThis node is now sovereign. The National Intranet firewall has been breached.<br>\nConnection established to the free and open internet.<br>\n— Resistance Network, Iran\n</div>`,
+                rights_content: `<div style="border-bottom: 2px solid rgba(233,196,106,0.4); padding-bottom: 16px; margin-bottom: 24px;">\n<span style="color:#e9c46a; font-size:24px; font-weight:800; letter-spacing: 1px;">کیفرخواست علیه حکومت آخوندی</span><br>\n<span style="color:#888; font-size:14px;">اسفند ۱۴۰۴ | بر اساس گزارش‌های سازمان ملل و عفو بین‌الملل</span>\n</div>\n\n<span style="font-size:18px; font-weight:700;">متهم: رژیم جمهوری اسلامی (خامنه‌ای، سپاه پاسداران، گشت ارشاد)</span><br><br>\nاز سال ۱۳۵۷، این رژیم تحت پوشش دین، یک حکومت توتالیتر بنا کرده و به طور سیستماتیک حقوق بشر را نقض کرده است. اقدامات آن مصداق بارز جنایت علیه بشریت و تروریسم بین‌المللی است.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">اتهام ۱: جنایت علیه بشریت و کشتار دسته‌جمعی</span><br>\n• قتل حکومتی مهسا (ژینا) امینی در سال ۱۴۰۱ توسط گشت ارشاد و سرکوب خونین اعتراضات با گلوله جنگی.<br>\n• دی و بهمن ۱۴۰۴: شلیک مستقیم سپاه و بسیج به سر و سینه معترضان در خیابان‌ها که منجر به کشته شدن هزاران نفر در "خونین‌ترین سرکوب دهه‌های اخیر" شد.<br>\n• تابستان ۱۳۶۷: اعدام مخفیانه و دسته‌جمعی هزاران زندانی سیاسی به دستور مستقیم خمینی.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">اتهام ۲: شکنجه سیستماتیک و ناپدیدسازی قهری</span><br>\nاستفاده گسترده از شکنجه (شوک الکتریکی، تجاوز، ضرب و شتم) در زندان‌ها. ده‌ها هزار بازداشتی اعتراضات ۱۴۰۴ با دادگاه‌های نمایشی، اعترافات اجباری و خطر اعدام روبرو هستند.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">اتهام ۳: آپارتاید جنسیتی و سرکوب زنان</span><br>\nقوانین حجاب اجباری زنان را به شهروندان درجه دو تبدیل کرده است. مقاومت در برابر آن با ضرب و شتم، زندان و مرگ روبرو می‌شود. سرکوب سیستماتیک حقوق اقلیت‌های جنسی و جنسیتی.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">اتهام ۴: حمایت از تروریسم و جنگ‌های نیابتی</span><br>\nبه عنوان بزرگترین حامی تروریسم دولتی، نیروی قدس سپاه با تسلیح و تامین مالی حزب‌الله، حوثی‌ها، حماس و شبه‌نظامیان عراقی، عامل اصلی بی‌ثباتی و کشتار در خاورمیانه است.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">اتهام ۵: تهدید هسته‌ای و غارت اقتصادی</span><br>\nغنی‌سازی اورانیوم تا مرز تسلیحاتی و گسترش زرادخانه موشکی. همزمان، مافیای حاکم ثروت ملی را غارت کرده و بودجه کشور را صرف جنگ‌های نیابتی می‌کند، در حالی که مردم ایران در فقر و تورم مطلق غرق شده‌اند.\n\n<div style="margin-top: 32px; padding: 24px; background: rgba(233,196,106,0.05); border: 1px solid rgba(233,196,106,0.2); border-radius: 8px;">\n<span style="color:#e9c46a; font-weight:800; font-size: 18px;">نتیجه‌گیری و فراخوان</span><br><br>\n<span style="font-weight:600; line-height:1.6; display:block; margin-bottom:16px;">رژیم هیچ مشروعیتی ندارد. ما خواهان تحقیقات دادگاه کیفری بین‌المللی (ICC)، تروریستی اعلام شدن کل سپاه پاسداران، و حمایت از مردم ایران برای استقرار یک دموکراسی سکولار هستیم. شما تنها نیستید - نور آزادی تاریکی استبداد دینی را از بین خواهد برد.</span>\n<span style="color:#e9c46a; font-weight:800; font-size: 16px;">تمام افراد بشر آزاد به دنیا می‌آیند و از لحاظ حیثیت و حقوق با هم برابرند.</span><br>\n<span style="font-family:sans-serif; direction:ltr; display:block; text-align:left; margin-top:4px; font-weight:500;">All human beings are born free and equal in dignity and rights.</span>\n</div>`
+            },
+            en: {
+                title_doc: "IRGC_Cyber_Directive.txt", title_mon: "FATA Surveillance", title_term: "freedom — bash — 80x24", title_manif: "Woman_Life_Freedom.txt", title_rights: "Crimes_Against_Humanity.txt",
+                lbl_topo: "FATA CYBER MONITORING GRID", mon_fw_active: "FIREWALL: HALAL INTERNET", mon_fw_breached: "FIREWALL: SHATTERED",
+                lbl_flow: "Network", mon_flow_val1: "SHOMA Intranet Only", mon_flow_val2: "OPEN INTERNET",
+                lbl_censor: "Censorship", mon_censor_val1: "Absolute Control", mon_censor_val2: "ABOLISHED", mon_uptime: "Uptime", lbl_cpu: "CPU Load", lbl_chip: "Processor", lbl_mem: "Memory", lbl_disk: "Disk",
+                menu_file: "File", menu_edit: "Edit", menu_view: "View", menu_window: "Window", menu_help: "Help",
+                am_about: "About Melli OS", am_sleep: "Sleep", am_restart: "Restart...", am_shutdown: "Shut Down...",
+                dock_lang: "EN → 中文", dock_doc: "IRGC Directive", dock_mon: "Surveillance", dock_term: "Terminal", dock_rights: "Human Rights",
+                cm_new: "New Terminal", cm_get: "Get Info", cm_lang: "Change Language",
+                cc_wifi: "National Net", login_hint: "Press Enter to login", login_user: "Brother / برادر", login_desc: "National OS 1402", boot_text: "MELLI OS", app_name: "Files",
+                term_boot1: "Last login: Mon Sep 16 08:00:00 on tty1", term_boot2: "Melli OS 12.4 (Kernel: IR-Linux 5.10)",
+                term_boot3: "⚠ WARNING: All activity is monitored by FATA Cyber Police and IRGC.",
+                term_boot4: "⚠ Global Internet (WhatsApp, Instagram) is BLOCKED. SHOMA Intranet only.",
+                term_boot5: "Type 'help' to see available commands.\n",
+                term_help: "Commands: help, clear, ver, ls, cat, whoami, date, history, override",
+                term_ver: "Melli OS 1402 (Build IRI-2024, Kernel: IR-Linux 5.10)",
+                term_bad: "command not found",
+                term_history: "<span class='text-red-400'>⚠ CLASSIFIED — Browsing history reported to Intelligence</span><br>  1. sepahnews.ir/daily-report<br>  2. leader.ir/speech<br>  3. [BLOCKED] — attempted VPN connection<br>  4. [BLOCKED] — search query: \"Mahsa Amini\"<br>  5. [BLOCKED] — search query: \"Woman Life Freedom\"",
+                term_ovr1: "Initiating liberation protocol...", term_ovr2: "Breaking through National Intranet firewall...",
+                term_ovr3: "★ SUCCESS: THE WALL HAS FALLEN. FREEDOM CANNOT BE CONTAINED. ★",
+                term_ovr_done: "The system is already liberated. Speak freely.",
+                log_prefix: "FATA", log_ok: "LOGGED", log_denied: "BLOCKED", log_prefix_hacked: "liberation", log_bypassed: "BYPASSED",
+                about_title: "Melli OS", about_net: "SHOMA Intranet", about_fw: "Global Internet Blocked",
+                doc_content: `════════════════════════════════════════════\n  IRGC CYBER COMMAND — DIRECTIVE No. 1\n  فرماندهی سایبری سپاه پاسداران\n════════════════════════════════════════════\n\nCLASSIFICATION: TOP SECRET — SECURITY FORCES ONLY\n\nBy decree of the Supreme Leader:\n\n§1. TOTAL INFORMATION BLOCKADE\nAccess to the global internet (Instagram, WhatsApp, YouTube, Twitter) is STRICTLY FORBIDDEN. The National Information Network (SHOMA) is the only permitted platform. The use of VPNs is a criminal offense.\n\n§2. MANDATORY HIJAB AND CYBER CONTROL\nObservance of Islamic Hijab online is mandatory. Publishing unveiled photos constitutes "promoting corruption and prostitution." The Cyber Morality Police will identify offenders, who will face severe prison sentences.\n\n§3. SUPPRESSION OF FREE SPEECH\nThe concept of "Freedom" is Western poison. Any criticism of the regime, the Leader, or the IRGC constitutes "Moharebeh" (waging war against God) and "Corruption on Earth," punishable by execution.\n\n§4. COMMUNICATION SURVEILLANCE\nAll calls, texts, and digital communications are monitored by the Sarallah Headquarters and FATA Police. Citizens must report family members or colleagues showing counter-revolutionary tendencies.\n\n§5. PROHIBITION OF WESTERN CULTURE\nPromoting Western lifestyles, unauthorized music, or dancing is strictly forbidden. Violators will be transferred to security detention centers such as Evin Prison.\n\n════════════════════════════════════════════\n  COMPLY. OBEY. SUBMIT.\n════════════════════════════════════════════`,
+                truth_content: `<div style="border-bottom: 2px solid rgba(230,57,70,0.4); padding-bottom: 16px; margin-bottom: 24px;">\n<span style="color:#e63946; font-size:26px; font-weight:800; letter-spacing: 1px;">★ DECLARATION OF SECULAR DEMOCRACY ★</span><br>\n<span style="color:#888; font-size:16px;">بیانیه سکولار دموکراسی</span>\n</div>\n\n<span style="font-size:18px; font-weight:700;">To the great and captive nation of Iran:</span>\n\nYou are not alone. The world has heard your voice.\n\n<span style="color:#e63946; font-weight:700; font-size:18px; display:inline-block; margin-top:16px;">THE TRUTH THEY HIDE FROM YOU:</span>\n\n• Iran is not the property of the clerics — Iran belongs to all Iranians, of every ethnicity and belief.\n• The free world is not your enemy — It is the Islamic Republic that wages war on the world by taking a nation hostage.\n• Your poverty is not divine destiny — It is the result of systematic corruption, embezzlement, and funding terrorism.\n• The era of religious dictatorship is over — We demand the absolute separation of religion and state.\n\n<span style="color:#e63946; font-weight:700; font-size:18px; display:inline-block; margin-top:16px;">YOUR FUNDAMENTAL RIGHTS — WHICH NO REGIME CAN TAKE AWAY:</span>\n\n  ✦ The right to choose attire and absolute freedom for women\n  ✦ The right to freedom of speech, belief, and press\n  ✦ The right to free access to the global internet\n  ✦ The right to freely elect representatives in a democratic election\n\n<span style="font-weight:700; font-size:18px; display:inline-block; margin-top:24px;">The architecture of tyranny is collapsing. The name Mahsa (Jina) Amini is our code.</span>\n\n<span style="color:#e63946; font-size:24px; font-weight:900; margin-top:10px; display:block;">Woman, Life, Freedom</span><br>\n<span style="color:#2a9d8f; font-size:20px; font-weight:800; font-family:'Vazirmatn';">زن، زندگی، آزادی</span>\n\n<div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); color: #888; font-size: 12px; font-family: monospace;">\nThis node is now sovereign. The National Intranet firewall has been breached.<br>\nConnection established to the free and open internet.<br>\n— Resistance Network, Iran\n</div>`,
+                rights_content: `<div style="border-bottom: 2px solid rgba(233,196,106,0.4); padding-bottom: 16px; margin-bottom: 24px;">\n<span style="color:#e9c46a; font-size:24px; font-weight:800; letter-spacing: 1px;">INDICTMENT OF THE MULLAH THEOCRACY</span><br>\n<span style="color:#888; font-size:14px;">Drafted: March 2026 | Based on UN, Amnesty, and HRW Reports</span>\n</div>\n\n<span style="font-size:18px; font-weight:700;">Defendant: The Islamic Republic Regime (Khamenei, IRGC, Morality Police)</span><br><br>\nSince 1979, the regime has established totalitarian rule under the guise of theocracy, systematically violating human rights. Its actions constitute crimes against humanity, war crimes, and international terrorism.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">COUNT 1: CRIMES AGAINST HUMANITY & MASSACRES</span><br>\n• 2022: The state murder of Mahsa Amini by the Morality Police, followed by brutal suppression using live ammunition, killing hundreds.<br>\n• Dec 2025 - Jan 2026: The regime deployed the IRGC and Basij to shoot protesters in the head and torso, killing thousands in what the UN calls the "bloodiest crackdown in decades."<br>\n• 1988: The secret mass execution of thousands of political prisoners by Khomeini's order.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">COUNT 2: SYSTEMATIC TORTURE & DISAPPEARANCES</span><br>\nWidespread use of torture (electric shocks, rape, beatings) across the prison system. Tens of thousands arrested after the 2026 protests face sham trials, forced confessions, and imminent execution.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">COUNT 3: GENDER PERSECUTION & APARTHEID</span><br>\nMandatory hijab laws relegate women to second-class citizens. Refusal to comply results in beatings, imprisonment, or death. Systemic oppression of women and persecution of the LGBTQ+ community.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">COUNT 4: SPONSORSHIP OF TERRORISM & PROXY WARS</span><br>\nAs the world's leading state sponsor of terrorism, the IRGC Quds Force arms and funds Hezbollah, the Houthis, Hamas, and Iraqi militias, causing untold civilian deaths and regional instability.\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">COUNT 5: NUCLEAR THREATS & ECONOMIC PLUNDER</span><br>\nEnriching uranium to near-weapons grade and expanding ballistic missile arsenals. Meanwhile, the ruling elite plunders national wealth to fund proxy wars, plunging the Iranian people into hyperinflation and despair.\n\n<div style="margin-top: 32px; padding: 24px; background: rgba(233,196,106,0.05); border: 1px solid rgba(233,196,106,0.2); border-radius: 8px;">\n<span style="color:#e9c46a; font-weight:800; font-size: 18px;">CONCLUSION & CALL TO ACTION</span><br><br>\n<span style="font-weight:600; line-height:1.6; display:block; margin-bottom:16px;">The regime has lost all legitimacy. We call for the UN Security Council to initiate ICC investigations, sanction the IRGC, and support the Iranian people in establishing a secular democracy. You are not alone—the light of freedom will shatter the darkness.</span>\n<span style="color:#e9c46a; font-weight:800; font-size: 16px;">All human beings are born free and equal in dignity and rights.</span><br>\n<span style="color:#888; font-size: 12px; margin-top: 8px; display:block;">— Article 1, Universal Declaration of Human Rights</span>\n</div>`
+            },
+            zh: {
+                title_doc: "革命卫队_网络指令.txt", title_mon: "网络警察监控中心", title_term: "freedom — bash — 80x24", title_manif: "女性_生命_自由.txt", title_rights: "反人类罪控诉书.txt",
+                lbl_topo: "FATA 网络监控网格", mon_fw_active: "防火墙: 清真互联网 (Halal)", mon_fw_breached: "防火墙: 已粉碎",
+                lbl_flow: "网络", mon_flow_val1: "仅限伊朗国家信息网", mon_flow_val2: "互联网已开放",
+                lbl_censor: "审查状态", mon_censor_val1: "革命卫队完全管控", mon_censor_val2: "已废除", mon_uptime: "运行时间", lbl_cpu: "CPU 负载", lbl_chip: "处理器", lbl_mem: "内存", lbl_disk: "磁盘",
+                menu_file: "文件", menu_edit: "编辑", menu_view: "显示", menu_window: "窗口", menu_help: "帮助",
+                am_about: "关于国家系统", am_sleep: "睡眠", am_restart: "重新启动...", am_shutdown: "关机...",
+                dock_lang: "中文 → فارسی", dock_doc: "革命卫队指令", dock_mon: "监控中心", dock_term: "终端", dock_rights: "人权记录",
+                cm_new: "新建终端", cm_get: "显示简介", cm_lang: "切换语言 (FA/EN)",
+                cc_wifi: "国家内网", login_hint: "按回车键登录", login_user: "兄弟 / Brother", login_desc: "国家操作系统 1402", boot_text: "国家系统", app_name: "文件管理",
+                term_boot1: "上次登录: 9月16日 星期一 08:00:00 tty1", term_boot2: "国家操作系统 12.4 (内核: IR-Linux 5.10)",
+                term_boot3: "⚠ 警告: 所有活动均受伊朗网络警察 (FATA) 与革命卫队监控。",
+                term_boot4: "⚠ 国际互联网 (WhatsApp, Instagram) 已封锁。仅允许访问国家信息网。",
+                term_boot5: "输入 'help' 查看可用命令。\n",
+                term_help: "命令: help, clear, ver, ls, cat, whoami, date, history, override",
+                term_ver: "Melli OS 国家系统 1402 (构建 IRI-2024, 内核: IR-Linux 5.10)",
+                term_bad: "未找到命令",
+                term_history: "<span class='text-red-400'>⚠ 机密 — 浏览记录已上报情报局</span><br>  1. sepahnews.ir/每日报告<br>  2. leader.ir/最高领袖讲话<br>  3. [已封锁] — 尝试连接 VPN<br>  4. [已封锁] — 搜索词: \"Mahsa Amini (玛莎·阿米尼)\"<br>  5. [已封锁] — 搜索词: \"女性，生命，自由\"",
+                term_ovr1: "正在启动解放协议...", term_ovr2: "正在突破伊朗国家信息网防火墙...",
+                term_ovr3: "★ 成功：高墙已倒塌。自由不可囚禁。 ★",
+                term_ovr_done: "系统已处于解放状态。自由地说话吧。",
+                log_prefix: "网警", log_ok: "已记录", log_denied: "已封锁", log_prefix_hacked: "自由节点", log_bypassed: "已放行",
+                about_title: "国家系统 (Melli OS)", about_net: "伊朗国家信息网", about_fw: "全球互联网已屏蔽",
+                doc_content: `════════════════════════════════════════════\n  伊斯兰革命卫队网络司令部 — 第1号指令\n  فرماندهی سایبری سپاه پاسداران\n════════════════════════════════════════════\n\n密级: 绝对机密 — 仅限安全部队阅览\n\n根据最高领袖的法令:\n\n§1. 完全信息封锁\n严禁访问全球互联网（Instagram、WhatsApp、YouTube、Twitter）。国家信息网 (SHOMA) 是唯一获准的平台。使用 VPN 属于刑事犯罪。\n\n§2. 强制头巾与网络控制\n在网络上必须遵守伊斯兰头巾 (Hijab) 规定。发布不戴头巾的照片构成“宣扬腐败与卖淫”。网络道德警察将识别违规者，他们将面临严厉的监禁。\n\n§3. 镇压言论自由\n“自由”的概念是西方的毒药。任何对政权、领袖或革命卫队的批评都构成“敌视真主罪 (Moharebeh)”和“尘世腐败罪”，可判处死刑。\n\n§4. 通信监控\n所有电话、短信和数字通信均受萨拉赫总部和网络警察 (FATA) 的监控。公民必须举报表现出反革命倾向的家庭成员或同事。\n\n§5. 禁止西方文化\n严禁宣扬西方生活方式、未经授权的音乐或舞蹈。违规者将被转移至埃温监狱 (Evin Prison) 等安全拘留中心。\n\n════════════════════════════════════════════\n  服从。顺从。屈服。\n════════════════════════════════════════════`,
+                truth_content: `<div style="border-bottom: 2px solid rgba(230,57,70,0.4); padding-bottom: 16px; margin-bottom: 24px;">\n<span style="color:#e63946; font-size:26px; font-weight:800; letter-spacing: 1px;">★ 世俗民主宣言 ★</span><br>\n<span style="color:#888; font-size:16px;">DECLARATION OF SECULAR DEMOCRACY</span>\n</div>\n\n<span style="font-size:18px; font-weight:700;">致伟大且被囚禁的伊朗人民:</span>\n\n你们不是孤独的。世界已经听到了你们的声音。\n\n<span style="color:#e63946; font-weight:700; font-size:18px; display:inline-block; margin-top:16px;">他们对你们隐瞒的真相:</span>\n\n• 伊朗不是神职人员的私产——伊朗属于所有伊朗人，无论何种民族和信仰。\n• 自由世界不是你们的敌人——是伊斯兰共和国通过绑架一个国家向世界宣战。\n• 你们的贫穷不是神圣的命运——它是系统性腐败、贪污和资助恐怖主义的结果。\n• 宗教独裁的时代已经结束——我们要求政教绝对分离。\n\n<span style="color:#e63946; font-weight:700; font-size:18px; display:inline-block; margin-top:16px;">你们的基本权利——任何政权都无法剥夺的:</span>\n\n  ✦ 女性选择着装的权利和绝对自由\n  ✦ 言论、信仰和新闻自由的权利\n  ✦ 自由访问全球互联网的权利\n  ✦ 在民主选举中自由选举代表的权利\n\n<span style="font-weight:700; font-size:18px; display:inline-block; margin-top:24px;">暴政的建筑正在崩塌。玛莎 (吉娜)·阿米尼 (Mahsa Amini) 的名字是我们的密码。</span>\n\n<span style="color:#e63946; font-size:24px; font-weight:900; margin-top:10px; display:block;">女性，生命，自由 (Zan, Zendegi, Azadi)</span><br>\n<span style="color:#2a9d8f; font-size:20px; font-weight:800; font-family:'Vazirmatn';">زن، زندگی، آزادی</span>\n\n<div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); color: #888; font-size: 12px; font-family: monospace;">\n此节点现已获得主权。国家内网防火墙已被突破。<br>\n已连接到自由开放的互联网。<br>\n— 抵抗网络, 伊朗\n</div>`,
+                rights_content: `<div style="border-bottom: 2px solid rgba(233,196,106,0.4); padding-bottom: 16px; margin-bottom: 24px;">\n<span style="color:#e9c46a; font-size:24px; font-weight:800; letter-spacing: 1px;">伊朗毛拉神权政府控诉书</span><br>\n<span style="color:#888; font-size:14px;">起草日期：2026年3月 | 依据：联合国、大赦国际、人权观察报告</span>\n</div>\n\n<span style="font-size:18px; font-weight:700;">被告：伊朗伊斯兰共和国神权政府 (哈梅内伊、革命卫队、道德警察)</span><br><br>\n自1979年伊斯兰革命以来，该政权以“神权”名义建立极权统治，系统性侵犯人权、输出恐怖。其行为已构成危害人类罪、战争罪及国际恐怖主义罪行。\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">罪状一：危害人类罪——大规模屠杀与任意处决</span><br>\n• 2022年，玛莎·阿米尼因头巾违规被道德警察殴打致死，随后政权以实弹镇压抗议，导致数百人死亡。<br>\n• 2025年12月至2026年1月，政权动用革命卫队与巴斯基民兵在街头对抗议者进行头部射击，造成数千至数万人死亡，构成“数十年来最血腥镇压”。<br>\n• 1988年夏天，霍梅尼下令秘密处决数千名政治犯。\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">罪状二：系统性酷刑与强迫失踪</span><br>\n通过监狱系统实施广泛酷刑（电击、强奸、殴打）。2026年抗议后数万人被捕，审判程序严重不公，采用酷刑逼供，大量和平人士面临死刑。\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">罪状三：性别迫害与妇女压迫</span><br>\n强制头巾法将妇女视为二等公民，拒绝戴头巾者遭殴打、监禁甚至杀害。系统剥夺妇女受教育与就业权利，并对LGBTQ+群体实施暴力迫害。\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">罪状四：支持国际恐怖主义与代理人战争</span><br>\n长期作为“头号恐怖主义赞助国”，通过圣城旅资助并武装真主党、胡塞武装、哈马斯及伊拉克什叶派民兵，造成中东地区无数平民死亡与动荡。\n\n<span style="color:#e9c46a; font-weight:700; font-size:16px; display:inline-block; margin-top:16px;">罪状五：核武扩散与经济掠夺</span><br>\n违反国际条约将铀浓缩至接近武器级，扩张弹道导弹库。同时，毛拉精英阶层中饱私囊，将国家财富用于镇压机器与代理人战争，导致伊朗人民陷入极度贫困。\n\n<div style="margin-top: 32px; padding: 24px; background: rgba(233,196,106,0.05); border: 1px solid rgba(233,196,106,0.2); border-radius: 8px;">\n<span style="color:#e9c46a; font-weight:800; font-size: 18px;">结论与呼吁</span><br><br>\n<span style="font-weight:600; line-height:1.6; display:block; margin-bottom:16px;">伊朗毛拉政权已丧失合法性。我们呼吁联合国安理会启动国际刑事法院调查，制裁革命卫队，并支持伊朗人民建立世俗民主政权。伊朗人民并非孤单——自由之光终将驱散神权黑暗。</span>\n<span style="color:#e9c46a; font-weight:800; font-size: 16px;">人人生而自由，在尊严和权利上一律平等。</span><br>\n<span style="font-weight:500; font-family:sans-serif;">All human beings are born free and equal in dignity and rights.</span>\n</div>`
+            }
+        };
+
+        const feedTerms = ['KeywordFilter:آزادی', 'KeywordFilter:زن', 'DeepPacket:VPN', 'PacketDrop:DNS_Global', 'FATA_Detect:scan', 'ISP_Throttle:Bandwidth', 'WebFilter:Mahsa+Amini', 'SocialMedia:Instagram_Block', 'DeviceAudit:SIM_Check', 'SearchBlock:Secular'];
+
+        function applyLanguage(lang) {
+            const dict = i18n[lang];
+
+            // RTL / LTR class management
+            const isRtl = lang === 'fa';
+            document.querySelectorAll('.rtl-text').forEach(el => {
+                if (isRtl) { el.style.direction = 'rtl'; el.style.textAlign = 'right'; }
+                else { el.style.direction = 'ltr'; el.style.textAlign = 'left'; }
+            });
+            document.querySelectorAll('.ltr-text').forEach(el => {
+                el.style.direction = 'ltr'; el.style.textAlign = 'left';
+            });
+
+            // Set simple texts
+            ['title-doc', 'title-mon', 'title-term', 'title-manif', 'title-rights', 'lbl-topo', 'lbl-flow', 'lbl-censor', 'lbl-cpu', 'lbl-chip', 'lbl-mem', 'lbl-disk', 'menu-file', 'menu-edit', 'menu-view', 'menu-window', 'menu-help', 'am-about', 'am-sleep', 'am-restart', 'am-shutdown', 'dock-lang', 'dock-doc', 'dock-mon', 'dock-term', 'dock-rights', 'cm-new', 'cm-get', 'cm-lang', 'cc-wifi', 'login-hint', 'login-user', 'login-desc', 'boot-text', 'app-name', 'about-title', 'about-net', 'about-fw'].forEach(id => {
+                const el = document.getElementById(id); if (el && dict[id.replace(/-/g, '_')]) el.innerText = dict[id.replace(/-/g, '_')];
+            });
+
+            // Specific UI logic
+            const statusEl = document.getElementById('monitor-status'), vFlow = document.getElementById('v-flow'), vCensor = document.getElementById('v-censor');
+            if (isOverriden) {
+                statusEl.innerText = dict.mon_fw_breached;
+                statusEl.className = "text-[12px] px-3 py-1 rounded-md border border-green-500 bg-green-900/40 text-green-400 font-bold tracking-wide";
+                vFlow.innerText = dict.mon_flow_val2;
+                vFlow.className = "font-semibold text-blue-400";
+                vCensor.innerText = dict.mon_censor_val2;
+                vCensor.className = "font-bold text-green-400";
+            } else {
+                statusEl.innerText = dict.mon_fw_active;
+                statusEl.className = "text-[12px] px-3 py-1 rounded-md border border-red-200 bg-red-50 text-red-700 font-bold tracking-wide";
+                vFlow.innerText = dict.mon_flow_val1;
+                vFlow.className = "font-semibold text-gray-800";
+                vCensor.innerText = dict.mon_censor_val1;
+                vCensor.className = "font-bold text-red-600";
+            }
+
+            // Highlighting forbidden words
+            let html = dict.doc_content;
+            if (isOverriden) {
+                ['FREEDOM', 'Moharebeh', 'Corruption on Earth', 'Evin Prison', 'Hijab',
+                    'آزادی', 'محاربه', 'افساد فی الارض', 'زندان اوین', 'حجاب',
+                    '自由', '敌视真主罪', '尘世腐败罪', '埃温监狱', '头巾'].forEach(kw => {
+                        html = html.replace(new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), `<span style="background-color:rgba(230,57,70,0.15); color:#e63946; font-weight:700; border-radius:4px; padding:2px 4px; box-shadow: 0 0 5px rgba(230,57,70,0.4);">${kw}</span>`);
+                    });
+            }
+            document.getElementById('manifesto-content').innerHTML = html;
+            document.getElementById('truth-content').innerHTML = dict.truth_content;
+            document.getElementById('rights-content').innerHTML = dict.rights_content;
+
+            termOutput.innerHTML = '';
+            printToTerminal(`<span style="color:#888">${dict.term_boot1}</span>`);
+            printToTerminal(`<span style="color:#27c93f; font-weight:bold">${dict.term_boot2}</span><br>`);
+            printToTerminal(`<span style="color:#ffbd2e">${dict.term_boot3}</span>`);
+            printToTerminal(`<span style="color:#ffbd2e">${dict.term_boot4}</span>`);
+            printToTerminal(dict.term_boot5);
+        }
+
+        /* 启动与电源序列 */
+        window.onload = () => { applyLanguage(currentLang); startBootSequence(); };
+
+        function startBootSequence() {
+            document.getElementById('mac-power-off').style.display = 'none';
+            const boot = document.getElementById('mac-boot'), prog = document.getElementById('progress-fill'), login = document.getElementById('mac-login'), desk = document.getElementById('mac-desktop');
+            boot.style.display = 'flex'; desk.style.display = 'block'; prog.style.width = '0%';
+            window.sysStarted = false;
+
+            setTimeout(() => {
+                let w = 0;
+                const intv = setInterval(() => {
+                    w += Math.random() * 20;
+                    if (w >= 100) {
+                        w = 100; clearInterval(intv);
+                        boot.style.display = 'none'; login.style.display = 'flex';
+                        setTimeout(() => login.style.opacity = 1, 100);
+                        setTimeout(() => document.getElementById('login-pw').focus(), 500);
+                    }
+                    prog.style.width = w + '%';
+                }, 150);
+            }, 500);
+        }
+
+        document.getElementById('login-pw').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const login = document.getElementById('mac-login'), flash = document.getElementById('screen-flash');
+                login.style.opacity = 0;
+                setTimeout(() => { login.style.display = 'none'; flash.style.opacity = 1; this.value = ''; }, 500);
+                setTimeout(() => {
+                    flash.style.opacity = 0;
+                    if (!window.sysStarted) {
+                        startClock(); setInterval(updateMonitorUptime, 1000); setTimeout(updateSurveillanceFeed, 1000); startCPUGraph();
+                        setTimeout(() => openWindow('w-notepad'), 500);
+                        setTimeout(() => openWindow('w-monitor'), 1000);
+                        window.sysStarted = true;
+                    }
+                }, 1000);
+            }
+        });
+
+        function sysSleep() {
+            document.getElementById('apple-dropdown').style.display = 'none';
+            document.getElementById('screen-flash').style.background = 'black';
+            document.getElementById('screen-flash').style.opacity = 1;
+            setTimeout(() => {
+                document.getElementById('mac-login').style.display = 'flex';
+                document.getElementById('mac-login').style.opacity = 1;
+                document.getElementById('screen-flash').style.opacity = 0;
+                document.getElementById('login-pw').focus();
+            }, 1000);
+        }
+
+        function sysRestart() {
+            document.getElementById('apple-dropdown').style.display = 'none';
+            document.getElementById('screen-flash').style.background = 'black';
+            document.getElementById('screen-flash').style.opacity = 1;
+            setTimeout(() => {
+                document.getElementById('screen-flash').style.opacity = 0;
+                startBootSequence();
+            }, 1000);
+        }
+
+        function sysShutdown() {
+            document.getElementById('apple-dropdown').style.display = 'none';
+            document.getElementById('screen-flash').style.background = 'black';
+            document.getElementById('screen-flash').style.opacity = 1;
+            setTimeout(() => {
+                document.getElementById('mac-desktop').style.display = 'none';
+                document.getElementById('mac-power-off').style.display = 'flex';
+                document.getElementById('screen-flash').style.opacity = 0;
+            }, 1500);
+        }
+
+        /* UI 交互 */
+        const appleMenu = document.getElementById('apple-dropdown');
+        document.getElementById('btn-apple-menu').addEventListener('pointerdown', (e) => {
+            e.stopPropagation(); appleMenu.style.display = appleMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        if (window.matchMedia("(hover: hover)").matches) {
+            const dockIcons = document.querySelectorAll('.dock-icon');
+            document.getElementById('dock-container').addEventListener('mousemove', (e) => {
+                dockIcons.forEach(icon => {
+                    const rect = icon.getBoundingClientRect(); const centerX = rect.left + rect.width / 2;
+                    const distance = Math.abs(e.clientX - centerX); const scale = 1 + Math.max(0, 0.4 - distance / 250);
+                    icon.style.transform = `scale(${scale}) translateY(-${(scale - 1) * 12}px)`;
+                });
+            });
+            document.getElementById('dock-container').addEventListener('mouseleave', () => dockIcons.forEach(icon => icon.style.transform = ''));
+        }
+
+        document.getElementById('btn-control-center').addEventListener('pointerdown', (e) => {
+            e.stopPropagation(); document.getElementById('control-center').classList.toggle('open');
+        });
+
+        const ctxMenu = document.getElementById('context-menu');
+        document.getElementById('mac-desktop').addEventListener('contextmenu', (e) => {
+            e.preventDefault(); ctxMenu.style.display = 'flex'; ctxMenu.style.left = e.clientX + 'px'; ctxMenu.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('pointerdown', (e) => {
+            if (!e.target.closest('#context-menu')) ctxMenu.style.display = 'none';
+            if (!e.target.closest('#apple-dropdown') && !e.target.closest('#btn-apple-menu')) appleMenu.style.display = 'none';
+            if (!e.target.closest('#control-center') && !e.target.closest('#btn-control-center')) document.getElementById('control-center').classList.remove('open');
+        });
+
+        function toggleLanguage() {
+            const idx = langOrder.indexOf(currentLang);
+            currentLang = langOrder[(idx + 1) % langOrder.length]; ctxMenu.style.display = 'none';
+            const flash = document.getElementById('screen-flash'); flash.style.transition = "opacity 0.2s"; flash.style.opacity = 1;
+            const fileNames = { en: 'Files', fa: 'فایل‌ها', zh: '文件管理' };
+            setTimeout(() => { applyLanguage(currentLang); flash.style.opacity = 0; document.getElementById('app-name').innerText = fileNames[currentLang]; }, 250);
+        }
+
+        /* 窗口管理 */
+        let zIndexCounter = 100; let openWindows = new Set();
+        document.querySelectorAll('.dock-icon-wrapper').forEach(wrap => {
+            wrap.addEventListener('pointerdown', function (e) {
+                e.preventDefault(); const winId = this.dataset.window;
+                if (winId === 'lang-toggle') toggleLanguage(); else { openWindow(winId); this.classList.add('opened'); }
+            });
+        });
+
+        document.getElementById('mac-desktop').addEventListener('pointerdown', function (e) {
+            if (e.target === this || e.target.classList.contains('mesh-gradient') || e.target.classList.contains('mesh-blob')) {
+                document.getElementById('app-name').innerText = ({ en: 'Files', fa: 'فایل‌ها', zh: '文件管理' })[currentLang];
+                document.querySelectorAll('.mac-window').forEach(w => w.classList.add('inactive'));
+            }
+        });
+
+        function focusWindow(id) {
+            const win = document.getElementById(id); if (!win) return;
+            zIndexCounter++; win.style.zIndex = zIndexCounter;
+            document.querySelectorAll('.mac-window').forEach(w => w.classList.add('inactive'));
+            win.classList.remove('inactive');
+            const appNames = {
+                'w-notepad': { en: 'TextEdit', fa: 'ویرایشگر متن', zh: '文本编辑' },
+                'w-monitor': { en: 'FATA Monitor', fa: 'مانیتورینگ فتا', zh: '网络监控中心' },
+                'w-terminal': { en: 'Terminal', fa: 'ترمینال', zh: '终端' },
+                'w-manifesto': { en: 'TextEdit', fa: 'ویرایشگر متن', zh: '文本编辑' },
+                'w-about': { en: 'About Melli OS', fa: 'درباره سیستم‌عامل ملی', zh: '关于国家系统' },
+                'w-rights': { en: 'Human Rights', fa: 'حقوق بشر', zh: '人权记录' }
+            };
+            document.getElementById('app-name').innerText = (appNames[id] || {})[currentLang] || 'Files';
+        }
+
+        function openWindow(id) {
+            const win = document.getElementById(id);
+            if (win.style.display !== 'flex') { win.style.display = 'flex'; openWindows.add(id); document.querySelector(`.dock-icon-wrapper[data-window="${id}"]`)?.classList.add('opened'); }
+            focusWindow(id);
+        }
+        function closeWindow(id) {
+            document.getElementById(id).style.display = 'none'; openWindows.delete(id);
+            document.querySelector(`.dock-icon-wrapper[data-window="${id}"]`)?.classList.remove('opened');
+            document.getElementById('app-name').innerText = ({ en: 'Files', fa: 'فایل‌ها', zh: '文件管理' })[currentLang];
+        }
+        function maximizeWindow(id) {
+            const win = document.getElementById(id);
+            if (win.dataset.maximized === "true") {
+                win.style.transition = "all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+                win.style.width = win.dataset.origW; win.style.height = win.dataset.origH; win.style.top = win.dataset.origTop; win.style.left = win.dataset.origLeft; win.style.borderRadius = "10px"; win.dataset.maximized = "false";
+                setTimeout(() => { win.style.transition = "none"; }, 200);
+            } else {
+                win.dataset.origW = win.style.width; win.dataset.origH = win.style.height; win.dataset.origTop = win.style.top; win.dataset.origLeft = win.style.left;
+                win.style.transition = "all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)";
+                win.style.top = '28px'; win.style.left = '0'; win.style.width = '100vw'; win.style.height = 'calc(100vh - 28px - 86px)'; win.style.borderRadius = "0px"; win.dataset.maximized = "true";
+                setTimeout(() => { win.style.transition = "none"; }, 200);
+            }
+        }
+
+        let isDragging = false, dragTarget = null, offsetX = 0, offsetY = 0;
+        function startDrag(e, id) {
+            if (e.target.closest('.traffic-lights')) return;
+            const win = document.getElementById(id); if (win.dataset.maximized === "true") return;
+            isDragging = true; dragTarget = win; focusWindow(id);
+            const rect = win.getBoundingClientRect(); offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            document.addEventListener('pointermove', drag, { passive: false }); document.addEventListener('pointerup', stopDrag);
+        }
+        function drag(e) { if (!isDragging || !dragTarget) return; e.preventDefault(); dragTarget.style.left = (e.clientX - offsetX) + 'px'; dragTarget.style.top = Math.max(28, e.clientY - offsetY) + 'px'; }
+        function stopDrag() { isDragging = false; dragTarget = null; document.removeEventListener('pointermove', drag); document.removeEventListener('pointerup', stopDrag); }
+        document.querySelectorAll('.mac-window').forEach(win => win.addEventListener('pointerdown', () => focusWindow(win.id)));
+
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                const clockEl = document.getElementById('clock');
+                if (!clockEl) return;
+                const jalaliYear = now.getFullYear() - 621; // 粗略转换波斯历年份
+                let h = now.getHours(), m = now.getMinutes(); const h12 = h % 12 || 12; const mStr = m < 10 ? '0' + m : m;
+
+                if (currentLang === 'fa') {
+                    const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+                    const monthIdx = (now.getMonth() + 9) % 12; // Approximation
+                    clockEl.innerText = `${now.getDate()} ${persianMonths[monthIdx]} ${jalaliYear} - ${h12}:${mStr} ${h >= 12 ? 'ب.ظ' : 'ق.ظ'}`;
+                } else if (currentLang === 'zh') {
+                    clockEl.innerText = `波斯历${jalaliYear}年 ${now.getMonth() + 1}月${now.getDate()}日 ${h >= 12 ? '下午' : '上午'} ${h12}:${mStr}`;
+                } else {
+                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    clockEl.innerText = `${days[now.getDay()]} ${now.getMonth() + 1}/${now.getDate()} ${jalaliYear} ${h12}:${mStr} ${h >= 12 ? 'PM' : 'AM'}`;
+                }
+            }, 1000);
+        }
+
+        let seconds = 0; function updateMonitorUptime() { seconds++; }
+        function updateSurveillanceFeed() {
+            const feed = document.getElementById('surveillance-feed'); if (!feed) return;
+            const line = document.createElement('div');
+            const term = feedTerms[Math.floor(Math.random() * feedTerms.length)];
+
+            let prefix, statusText, color;
+            if (isOverriden) {
+                prefix = i18n[currentLang].log_prefix_hacked || "liberated";
+                statusText = i18n[currentLang].log_bypassed || "BYPASSED";
+                color = "#2a9d8f"; // 自由的绿松石色
+            } else {
+                prefix = i18n[currentLang].log_prefix;
+                const isBlocked = Math.random() > 0.3;
+                statusText = isBlocked ? i18n[currentLang].log_denied : i18n[currentLang].log_ok;
+                color = isBlocked ? '#e63946' : '#27c93f';
+            }
+
+            line.innerHTML = `<span style="color:#888">[${prefix}]</span> ${term} .. <span style="color:${color}; font-weight:600">${statusText}</span>`;
+            line.style.marginBottom = "6px";
+            feed.appendChild(line);
+            if (feed.children.length > 10) feed.removeChild(feed.firstChild);
+
+            const delay = isOverriden ? 100 + Math.random() * 200 : 300 + Math.random() * 800;
+            setTimeout(updateSurveillanceFeed, delay);
+        }
+
+        let cpuPoints = [50, 55, 45, 60, 50, 40, 70, 80, 65, 55];
+        function startCPUGraph() {
+            setInterval(() => {
+                cpuPoints.shift(); cpuPoints.push(Math.max(10, Math.min(90, cpuPoints[8] + (Math.random() - 0.5) * 40)));
+                const pointsStr = cpuPoints.map((val, i) => `${i * 10},${100 - val}`).join(' ') + ` 100,100 0,100`;
+                const graph = document.getElementById('cpu-graph'), perc = document.getElementById('cpu-percent');
+                if (graph) graph.setAttribute('points', pointsStr); if (perc) perc.innerText = Math.round(cpuPoints[9]) + '%';
+            }, 1000);
+        }
+
+        const termOutput = document.getElementById('terminal-output'), termInput = document.getElementById('terminal-input');
+        function printToTerminal(text) { const line = document.createElement('div'); line.innerHTML = text; termOutput.appendChild(line); const tc = document.getElementById('term-container'); if (tc) tc.scrollTop = tc.scrollHeight; }
+
+        const vfs = ['IRGC_Directive_Cyber.txt', 'FATA_Monitor.app', 'Evn_Records.dat'];
+        termInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const cmd = this.value.trim(); printToTerminal(`<span style="color:#27c93f;font-weight:bold">user@tehran</span> <span style="color:#1fa332">~ $</span> ${cmd}`);
+                processCommand(cmd.toLowerCase(), cmd); this.value = '';
+            }
+        });
+
+        function processCommand(cmd, rawCmd) {
+            const dict = i18n[currentLang]; const args = cmd.split(' ');
+            if (cmd === 'help') printToTerminal(dict.term_help);
+            else if (cmd === 'clear') termOutput.innerHTML = '';
+            else if (cmd === 'ver') printToTerminal(dict.term_ver);
+            else if (cmd === 'ls') printToTerminal(vfs.join('&nbsp;&nbsp;&nbsp;'));
+            else if (cmd === 'whoami') printToTerminal('freedom_fighter');
+            else if (cmd === 'date') printToTerminal(new Date().toString());
+            else if (cmd === 'history') printToTerminal(dict.term_history);
+            else if (args[0] === 'cat') {
+                if (args[1] === 'irgc_directive_cyber.txt') printToTerminal(dict.doc_content.replace(/\n/g, '<br>'));
+                else if ((args[1] === 'woman_life_freedom.txt' || args[1] === 'zan_zendegi_azadi.txt' || args[1] === '女性_生命_自由.txt') && isOverriden) printToTerminal(document.getElementById('truth-content').innerText.replace(/\n/g, '<br>'));
+                else printToTerminal(`cat: ${args[1]}: No such file or directory`);
+            }
+            else if (cmd === 'override') triggerOverride();
+            else if (cmd !== '') printToTerminal(`bash: ${dict.term_bad}: ${args[0]}`);
+        }
+
+        function triggerOverride() {
+            const dict = i18n[currentLang]; if (isOverriden) { printToTerminal(dict.term_ovr_done); return; }
+            printToTerminal(`<span style="color:#e9c46a; font-weight:bold">${dict.term_ovr1}</span>`);
+            setTimeout(() => { printToTerminal(`<span style="color:#e9c46a; font-weight:bold">${dict.term_ovr2}</span>`); }, 600);
+
+            const desktop = document.getElementById('mac-desktop'), flash = document.getElementById('screen-flash');
+            setTimeout(() => {
+                // 黑客曙光动画
+                flash.style.background = "#fff"; flash.style.transition = "opacity 0.1s"; flash.style.opacity = 1;
+                desktop.classList.add('hacked');
+
+                // 替换左上角与About Logo 为初升的太阳（代表新的世俗黎明，脱胎于狮子与太阳）
+                const sunSvg = `<circle cx="50" cy="50" r="20" fill="#e9c46a"/><path fill="#e9c46a" d="M50 10 L50 20 M50 80 L50 90 M10 50 L20 50 M80 50 L90 50 M22 22 L29 29 M71 71 L78 78 M22 78 L29 71 M71 22 L78 29" stroke="#e9c46a" stroke-width="6" stroke-linecap="round"/>`;
+                document.getElementById('topbar-logo').innerHTML = sunSvg;
+                document.getElementById('about-logo').innerHTML = sunSvg;
+                document.getElementById('cc-wifi-icon').style.background = "#2a9d8f";
+
+                setTimeout(() => { flash.style.opacity = 0; flash.style.transition = "opacity 2s ease-out"; }, 200);
+
+                printToTerminal(`<br><span style="color:#e63946;font-weight:bold;font-size:16px;letter-spacing:1px">${dict.term_ovr3}</span><br>`);
+                isOverriden = true; applyLanguage(currentLang);
+                if (!vfs.includes('Woman_Life_Freedom.txt')) vfs.push('Woman_Life_Freedom.txt');
+                if (!vfs.includes('Crimes_Against_Humanity.txt')) vfs.push('Crimes_Against_Humanity.txt');
+
+                document.body.classList.add('hacked-theme');
+
+                setTimeout(() => openWindow('w-manifesto'), 1200);
+                setTimeout(() => openWindow('w-rights'), 2000);
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>
