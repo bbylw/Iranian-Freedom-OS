@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="An interactive simulation exposing Iran's digital censorship regime. Break through the firewall. Woman, Life, Freedom.">
+    <meta name="theme-color" content="#0a0f0d">
     <title>Melli OS 1402 | Node of Freedom</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入优秀的波斯语开源字体 Vazirmatn -->
@@ -695,6 +697,7 @@
             backdrop-filter: blur(5px);
             transition: opacity 0.15s;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 10000;
         }
 
         .dock-tooltip::after {
@@ -1164,6 +1167,104 @@
         body.hacked-theme .bg-gray-200 {
             background-color: #3a443e !important;
         }
+
+        /* Hacked-theme scrollbar */
+        body.hacked-theme ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        body.hacked-theme ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* Hacked-theme surveillance feed */
+        body.hacked-theme .am-card.overflow-hidden {
+            background: #0d1210 !important;
+            border-color: rgba(42, 157, 143, 0.15) !important;
+        }
+
+        /* Dock icon active press on touch */
+        @media (hover: none) {
+            .dock-icon-wrapper:active .dock-icon {
+                transform: scale(0.88);
+                filter: brightness(0.75);
+            }
+            .dock-icon-wrapper .dock-tooltip {
+                display: none;
+            }
+        }
+
+        /* Power-off screen subtle pulse */
+        #mac-power-off .power-btn {
+            animation: breathe-power 4s ease-in-out infinite;
+        }
+        @keyframes breathe-power {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(204, 51, 51, 0); }
+            50% { box-shadow: 0 0 20px 4px rgba(204, 51, 51, 0.15); }
+        }
+
+        /* Boot logo shimmer */
+        #boot-text {
+            background: linear-gradient(90deg, #999 0%, #fff 50%, #999 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer-text 3s ease-in-out infinite;
+        }
+        @keyframes shimmer-text {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Login avatar hover glow */
+        .login-avatar:hover {
+            border-color: rgba(17, 121, 97, 0.8);
+            box-shadow: 0 0 0 0 rgba(17, 121, 97, 0.4), 0 10px 25px rgba(0,0,0,0.8), 0 0 30px rgba(17, 121, 97, 0.2);
+        }
+
+        /* Window resize handle */
+        .mac-window::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 16px;
+            height: 16px;
+            cursor: nwse-resize;
+            z-index: 10;
+        }
+
+        /* Menu bar active item ripple */
+        .menu-item:active {
+            transform: scale(0.96);
+            transition: transform 0.08s;
+        }
+
+        /* Traffic light hover reveal smoother */
+        .traffic-lights .t-btn::after {
+            transition: opacity 0.12s ease;
+        }
+
+        /* Hacked-theme notification border glow */
+        body.hacked-theme #notification-banner {
+            border-color: rgba(42, 157, 143, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(42, 157, 143, 0.1);
+        }
+
+        /* Terminal selection color */
+        .terminal-bg ::selection {
+            background: rgba(39, 201, 63, 0.3);
+            color: #fff;
+        }
+
+        /* Notepad selection color */
+        .notepad-text ::selection {
+            background: rgba(17, 121, 97, 0.2);
+        }
+        body.hacked-theme .notepad-text ::selection {
+            background: rgba(230, 57, 70, 0.25);
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -1179,7 +1280,7 @@
 
     <!-- 关机状态 -->
     <div id="mac-power-off">
-        <div class="power-btn" onclick="startBootSequence()">
+        <div class="power-btn" onclick="startBootSequence()" role="button" aria-label="Power on" tabindex="0" onkeydown="if(event.key==='Enter')startBootSequence()">
             <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#cc3333" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
@@ -1224,7 +1325,7 @@
         <div class="text-white text-2xl font-semibold mb-1 tracking-wide" id="login-user">برادر / Brother</div>
         <div class="text-gray-300 text-sm mb-6 font-medium" id="login-desc">سیستم‌عامل ملی ۱۴۰۲</div>
         <input type="password" class="login-input ltr-text" id="login-pw" placeholder="رمز عبور / Password"
-            autocomplete="off">
+            autocomplete="off" aria-label="Password">
         <div class="text-white/40 text-xs mt-6 font-medium tracking-wide" id="login-hint">برای ورود Enter را فشار دهید
         </div>
     </div>
@@ -1530,7 +1631,7 @@
                         <span class="text-green-400 font-bold">user@tehran</span><span class="text-green-600 mx-2">~
                             $</span>
                         <input type="text" id="terminal-input" class="terminal-input" autocomplete="off"
-                            spellcheck="false" autocapitalize="off"><span class="terminal-cursor"></span>
+                            spellcheck="false" autocapitalize="off" aria-label="Terminal input"><span class="terminal-cursor"></span>
                     </div>
                 </div>
             </div>
@@ -1714,6 +1815,7 @@
             if (isOverriden) {
                 statusEl.innerText = dict.mon_fw_breached;
                 statusEl.className = "text-[12px] px-3 py-1 rounded-md border border-green-500 bg-green-900/40 text-green-400 font-bold tracking-wide";
+                statusEl.style.animation = "none";
                 vFlow.innerText = dict.mon_flow_val2;
                 vFlow.className = "font-semibold text-blue-400";
                 vCensor.innerText = dict.mon_censor_val2;
@@ -1791,13 +1893,16 @@
 
         function sysSleep() {
             document.getElementById('apple-dropdown').style.display = 'none';
-            document.getElementById('screen-flash').style.background = 'black';
-            document.getElementById('screen-flash').style.opacity = 1;
+            const flash = document.getElementById('screen-flash');
+            flash.style.transition = 'opacity 0.8s';
+            flash.style.background = 'black';
+            flash.style.opacity = 1;
             setTimeout(() => {
                 document.getElementById('mac-login').style.display = 'flex';
                 document.getElementById('mac-login').style.opacity = 1;
-                document.getElementById('screen-flash').style.opacity = 0;
+                flash.style.opacity = 0;
                 document.getElementById('login-pw').focus();
+                setTimeout(() => { flash.style.background = 'white'; flash.style.transition = 'opacity 0.8s ease-in-out'; }, 1000);
             }, 1000);
         }
 
@@ -1989,7 +2094,9 @@
                 color = isBlocked ? '#e63946' : '#27c93f';
             }
 
-            line.innerHTML = `<span style="color:#666">[${prefix}]</span> <span style="color:#999">${term}</span> <span style="color:${color}; font-weight:600">${statusText}</span>`;
+            const now = new Date();
+            const ts = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+            line.innerHTML = `<span style="color:#555">${ts}</span> <span style="color:#666">[${prefix}]</span> <span style="color:#999">${term}</span> <span style="color:${color}; font-weight:600">${statusText}</span>`;
             line.style.cssText = "margin-bottom:6px; opacity:0; transform:translateX(-8px); transition: opacity 0.3s, transform 0.3s;";
             feed.appendChild(line);
             requestAnimationFrame(() => { line.style.opacity = "1"; line.style.transform = "translateX(0)"; });
@@ -2008,7 +2115,16 @@
                     cpuPoints.shift(); cpuPoints.push(Math.max(10, Math.min(90, cpuPoints[8] + (Math.random() - 0.5) * 40)));
                     const pointsStr = cpuPoints.map((val, i) => `${i * 10},${100 - val}`).join(' ') + ` 100,100 0,100`;
                     const graph = document.getElementById('cpu-graph'), perc = document.getElementById('cpu-percent');
-                    if (graph) { graph.setAttribute('points', pointsStr); graph.style.filter = `drop-shadow(0 0 3px rgba(39, 201, 63, 0.5))`; }
+                    if (graph) {
+                        graph.setAttribute('points', pointsStr);
+                        if (isOverriden) {
+                            graph.setAttribute('stroke', '#e9c46a');
+                            graph.setAttribute('fill', 'rgba(233,196,106,0.15)');
+                            graph.style.filter = 'drop-shadow(0 0 3px rgba(233, 196, 106, 0.5))';
+                        } else {
+                            graph.style.filter = 'drop-shadow(0 0 3px rgba(39, 201, 63, 0.5))';
+                        }
+                    }
                     if (perc) perc.innerText = Math.round(cpuPoints[9]) + '%';
                 }
                 requestAnimationFrame(updateCPU);
@@ -2033,7 +2149,7 @@
             else if (cmd === 'clear') termOutput.innerHTML = '';
             else if (cmd === 'ver') printToTerminal(dict.term_ver);
             else if (cmd === 'ls') printToTerminal(vfs.join('&nbsp;&nbsp;&nbsp;'));
-            else if (cmd === 'whoami') printToTerminal('freedom_fighter');
+            else if (cmd === 'whoami') printToTerminal(isOverriden ? '<span style="color:#e9c46a;font-weight:bold">freedom_fighter</span> 🕊️' : 'user_tehran');
             else if (cmd === 'date') printToTerminal(new Date().toString());
             else if (cmd === 'history') printToTerminal(dict.term_history);
             else if (args[0] === 'cat') {
@@ -2083,6 +2199,18 @@
                 if (!vfs.includes('Crimes_Against_Humanity.txt')) vfs.push('Crimes_Against_Humanity.txt');
 
                 document.body.classList.add('hacked-theme');
+
+                // Update monitor live indicator from red to green
+                const pingDot = document.querySelector('#w-monitor .animate-ping');
+                const solidDot = pingDot?.nextElementSibling;
+                if (pingDot) { pingDot.classList.remove('bg-red-400'); pingDot.classList.add('bg-green-400'); }
+                if (solidDot) { solidDot.classList.remove('bg-red-600'); solidDot.classList.add('bg-green-500'); }
+
+                // Update terminal prompt color
+                const promptUser = document.querySelector('#term-container .text-green-400');
+                const promptPath = document.querySelector('#term-container .text-green-600');
+                if (promptUser) { promptUser.style.color = '#e9c46a'; }
+                if (promptPath) { promptPath.style.color = '#e9c46a'; }
 
                 // Notification banner
                 setTimeout(() => showNotification(dict.notif_override), 600);
