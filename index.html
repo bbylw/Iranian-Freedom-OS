@@ -14,17 +14,23 @@
     <style>
         :root {
             --sys-accent: #117961;
-            --sys-red: #cc3333;
+            --sys-red: #ff453a;
             --sys-yellow: #ffbd2e;
-            --sys-green: #27c93f;
-            --win-bg: #f5f5f5;
-            --win-border: #b0b0b0;
-            --titlebar-active: linear-gradient(to bottom, #f6f6f6, #d4d4d4);
-            --titlebar-inactive: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
-            --text-main: #111111;
-            --glow-accent: rgba(17, 121, 97, 0.4);
-            --glow-red: rgba(204, 51, 51, 0.4);
-            --glow-gold: rgba(233, 196, 106, 0.4);
+            --sys-green: #32d74b;
+            --win-bg: rgba(245, 245, 245, 0.85);
+            --win-border: rgba(255, 255, 255, 0.4);
+            --titlebar-active: linear-gradient(180deg, rgba(246, 246, 246, 0.95) 0%, rgba(230, 230, 230, 0.9) 100%);
+            --titlebar-inactive: linear-gradient(180deg, rgba(240, 240, 240, 0.8) 0%, rgba(220, 220, 220, 0.75) 100%);
+            --text-main: #1d1d1f;
+            --glow-accent: rgba(17, 121, 97, 0.5);
+            --glow-red: rgba(255, 69, 58, 0.5);
+            --glow-gold: rgba(255, 204, 0, 0.5);
+            
+            /* macOS inspired shadows */
+            --shadow-window: 0 22px 70px 4px rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(0, 0, 0, 0.08);
+            --shadow-window-inactive: 0 4px 24px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            --shadow-dock: 0 4px 30px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            --shadow-menu: 0 0 1px rgba(0, 0, 0, 0.4), 0 10px 40px rgba(0, 0, 0, 0.25);
         }
 
         /* ══════ KEYFRAME ANIMATIONS ══════ */
@@ -138,7 +144,7 @@
 
         body {
             overflow: hidden;
-            background-color: #0a0f0d;
+            background-color: #0a0a0a;
             overscroll-behavior-y: none;
         }
 
@@ -214,25 +220,26 @@
             left: 50%;
             transform: translateX(-50%) translateY(-100%);
             z-index: 12000;
-            background: rgba(30, 36, 32, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(233, 196, 106, 0.3);
-            border-radius: 14px;
-            padding: 14px 24px;
-            color: #f0f0f0;
+            background: rgba(30, 35, 40, 0.9);
+            backdrop-filter: blur(24px) saturate(1.8);
+            -webkit-backdrop-filter: blur(24px) saturate(1.8);
+            border: 1px solid rgba(233, 196, 106, 0.25);
+            border-radius: 16px;
+            padding: 16px 28px;
+            color: #f5f5f7;
             font-size: 14px;
             font-weight: 600;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
             opacity: 0;
             pointer-events: none;
             display: flex;
             align-items: center;
-            gap: 12px;
-            max-width: 420px;
+            gap: 14px;
+            max-width: 460px;
+            letter-spacing: 0.2px;
         }
         #notification-banner.show {
-            animation: notification-slide 5s ease-in-out forwards;
+            animation: notification-slide 5.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         /* ══════ DESKTOP ══════ */
@@ -440,26 +447,27 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 28px;
-            background: rgba(255, 255, 255, 0.78);
-            backdrop-filter: blur(25px) saturate(1.8);
-            -webkit-backdrop-filter: blur(25px) saturate(1.8);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            height: 32px;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(20px) saturate(2);
+            -webkit-backdrop-filter: blur(20px) saturate(2);
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.15) inset;
             display: flex;
             align-items: center;
-            padding: 0 10px;
+            padding: 0 12px;
             z-index: 1000;
             font-size: 13px;
-            color: #111;
+            color: #1d1d1f;
             font-weight: 500;
             transition: all 0.5s;
+            letter-spacing: -0.1px;
         }
 
         body.hacked-theme #menu-bar {
-            background: rgba(30, 36, 32, 0.82);
+            background: rgba(30, 35, 38, 0.85);
             border-bottom-color: rgba(255, 255, 255, 0.06);
-            color: #e0e0e0;
+            color: #f5f5f7;
         }
 
         .menu-item {
@@ -601,28 +609,28 @@
         /* Dock栏 */
         #dock-container {
             position: fixed;
-            bottom: 12px;
+            bottom: 14px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding: 6px 10px;
-            gap: 8px;
-            height: 74px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(30px) saturate(1.5);
-            -webkit-backdrop-filter: blur(30px) saturate(1.5);
+            padding: 8px 12px;
+            gap: 10px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 0.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 26px;
+            box-shadow: var(--shadow-dock);
+            backdrop-filter: blur(25px) saturate(1.8);
+            -webkit-backdrop-filter: blur(25px) saturate(1.8);
             transition: all 0.5s;
         }
 
         body.hacked-theme #dock-container {
-            background: rgba(30, 36, 32, 0.3);
-            border-color: rgba(255, 255, 255, 0.08);
+            background: rgba(30, 35, 38, 0.25);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .dock-separator {
@@ -718,17 +726,35 @@
         /* 窗口 */
         .mac-window {
             position: absolute;
-            background-color: var(--win-bg);
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+            background: var(--win-bg);
+            border: 0.5px solid var(--win-border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-window);
             display: flex;
             flex-direction: column;
             min-width: 320px;
             min-height: 200px;
             display: none;
             overflow: hidden;
-            transition: background-color 0.5s, box-shadow 0.3s;
+            transition: box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s;
+            backdrop-filter: blur(25px) saturate(1.5);
+        }
+
+        .mac-window:hover {
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+        }
+
+        .mac-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+            pointer-events: none;
+            border-radius: 12px 12px 0 0;
+            z-index: 1;
         }
 
         .mac-window.window-opening {
@@ -959,13 +985,13 @@
 
         /* 终端 */
         .terminal-bg {
-            background-color: rgba(10, 15, 12, 0.95);
-            padding: 16px;
-            font-family: "SF Mono", "Consolas", "Courier New", monospace;
+            background: linear-gradient(180deg, rgba(12, 15, 13, 0.98) 0%, rgba(8, 11, 9, 0.99) 100%);
+            padding: 18px;
+            font-family: "SF Mono", "SFMono-Regular", "Menlo", "Monaco", "Consolas", monospace;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.7;
             flex-grow: 1;
-            color: #27c93f;
+            color: #32d74b;
             user-select: text;
             overflow-y: auto;
         }
@@ -984,12 +1010,13 @@
         .terminal-input:focus ~ .terminal-cursor,
         .terminal-cursor {
             display: inline-block;
-            width: 8px;
-            height: 16px;
-            background: #27c93f;
+            width: 9px;
+            height: 18px;
+            background: #32d74b;
             animation: terminal-cursor 1s step-end infinite;
             vertical-align: text-bottom;
-            margin-left: 1px;
+            margin-left: 2px;
+            border-radius: 1px;
         }
 
         .terminal-output {
@@ -998,7 +1025,32 @@
 
         /* Glitch effect class */
         .glitch-active {
-            animation: glitch-shake 0.3s linear;
+            animation: glitch-shake 0.4s linear;
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        .feed-line-animate {
+            animation: feed-line-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .content-fade {
+            animation: content-fade-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .live-dot {
+            animation: live-pulse 2s ease-in-out infinite;
+        }
+
+        #cpu-graph {
+            filter: drop-shadow(0 0 4px rgba(50, 215, 75, 0.4));
+            transition: all 0.5s;
+        }
+
+        body.hacked-theme #cpu-graph {
+            filter: drop-shadow(0 0 6px rgba(233, 196, 106, 0.5));
         }
 
         ::-webkit-scrollbar {
@@ -1253,7 +1305,7 @@
 
         /* Terminal selection color */
         .terminal-bg ::selection {
-            background: rgba(39, 201, 63, 0.3);
+            background: rgba(50, 215, 75, 0.3);
             color: #fff;
         }
 
@@ -1790,7 +1842,19 @@
             }
         };
 
-        const feedTerms = ['KeywordFilter:آزادی', 'KeywordFilter:زن', 'DeepPacket:VPN', 'PacketDrop:DNS_Global', 'FATA_Detect:scan', 'ISP_Throttle:Bandwidth', 'WebFilter:Mahsa+Amini', 'SocialMedia:Instagram_Block', 'DeviceAudit:SIM_Check', 'SearchBlock:Secular'];
+        const feedTerms = [
+    'KeywordFilter:آزادی', 'KeywordFilter:زن', 'KeywordFilter:زندگی', 
+    'KeywordFilter:اعتراض', 'KeywordFilter:مهسا_امینی',
+    'DeepPacket:VPN_Tunnel', 'DeepPacket:Tor_Detected', 'DeepPacket:Proxy_Chain',
+    'PacketDrop:DNS_Global', 'PacketDrop:HTTPS_Intercept', 
+    'FATA_Detect:Location_Scan', 'FATA_Detect:Biometric_Flag', 'FATA_Detect:Device_Fingerprint',
+    'ISP_Throttle:Bandwidth_Limit', 'ISP_Throttle:VoIP_Block',
+    'WebFilter:Instagram_Domain', 'WebFilter:Telegram_Proxy', 'WebFilter:Twitter_API',
+    'WebFilter:WhatsApp_Voice', 'WebFilter:YouTube_Video',
+    'SocialMedia:Post_Deleted', 'SocialMedia:Account_Suspended', 'SocialMedia:Comment_Hidden',
+    'DeviceAudit:SIM_Imei_Check', 'DeviceAudit:App_Inventory', 'DeviceAudit:Location_History',
+    'SearchBlock:VPN_Query', 'SearchBlock:Protest_News', 'SearchBlock:Human_Rights'
+];
 
         function applyLanguage(lang) {
             const dict = i18n[lang];

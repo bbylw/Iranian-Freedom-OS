@@ -1,0 +1,48 @@
+- generic [active]:
+  - generic:
+    - img
+  - generic [ref=e1]:
+    - img [ref=e2]
+    - generic [ref=e5]: MELLI OS
+  - generic [ref=e7]:
+    - generic [ref=e8]:
+      - img [ref=e10]
+      - generic [ref=e12]: فایل‌ها
+      - generic [ref=e13]: پرونده
+      - generic [ref=e14]: ویرایش
+      - generic [ref=e15]: نما
+      - generic [ref=e16]: پنجره
+      - generic [ref=e17]: راهنما
+      - generic [ref=e18] [cursor=pointer]:
+        - img
+        - img
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - img
+          - generic:
+            - generic: شبکه ملی
+            - generic: شبکه ملی
+        - generic:
+          - generic:
+            - img
+          - generic:
+            - generic: Bluetooth
+            - generic: مسدود شد
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - img [ref=e25] [cursor=pointer]
+        - generic: فارسی → EN
+      - generic [ref=e29]:
+        - generic: دستورالعمل‌های سپاه
+      - generic [ref=e37]:
+        - img [ref=e39] [cursor=pointer]
+        - generic: مانیتورینگ فتا
+      - generic [ref=e42]:
+        - generic [ref=e44] [cursor=pointer]: ">_"
+        - generic: ترمینال
+      - generic [ref=e47]:
+        - img [ref=e49] [cursor=pointer]
+        - generic: حقوق بشر
+    - text: ✕ − ✕ − + ✕ − + ✕ − + ✕ − + ✕ − +
